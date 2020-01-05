@@ -1,0 +1,10 @@
+fun first.d(X) = let d <- 0 in X
+fun next.d(X) = let d <- #d + 1 in X
+fun fby.d(X,Y) = if #d < 1 then X else let d <- #d - 1 in Y
+fun lPair.d(X) = let d <- #d * 2 in X
+fun rPair.d(X) = let d <- #d * 2 + 1 in X
+
+dim d <- 42
+var A = 1 + 2 + #d
+
+evalExpr next.d(A) @ []
