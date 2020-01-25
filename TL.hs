@@ -1,5 +1,5 @@
 module TL (
-  Ctx, Env,
+  TLctx, TLenv,
   TLdata(TLbool, TLchar, TLint, TLstr, TLfunc),
   TLuno(TLunNot, TLunNegate),
   TLduo(TLbinAnd, TLbinOr,
@@ -9,11 +9,12 @@ module TL (
          TLunop, TLbinop, TLcond, TLhash, TLat,
          TLvar, TLwhere, TLlambda, TLapply),
   TLdecl(TLdeclDim, TLdeclVar, TLdeclFunc),
-  TLenv(TLdim, TLenvExpr, TLenvBinding),
+  TLenvEntry(TLdim, TLenvExpr, TLenvBinding),
   TLeval(TLevalVar,TLevalExpr),
   TLfile(TLfile),
-  eval,isDeclDim,isDeclVar,isDeclFunc,isEvalVar,isEvalExpr,
-  evalFile
+  isDeclDim,isDeclVar,isDeclFunc,isEvalVar,isEvalExpr
+  ,eval
+  ,evalFile
 )
 where
 
@@ -21,64 +22,11 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Array as Array
 
-type Ctx = Map.Map Integer TLdata
-type Env = Map.Map String TLenv
-
-rank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
-
-findCell a ctx =
-  case ord of
-    Just i -> i
-    Nothing -> error $ "findCell did not find" ++ (show a)
-  where ord = Map.lookup a ctx
-
-find s env ctx =
-  case dim of
-    Just (TLdim a) -> findCell a ctx
-    Nothing -> error $ "find did not find " ++ s
-  where dim = Map.lookup s env
-
-changeOne s v env ctx =
-  case dim of
-    Just (TLdim a) -> Map.insert a v ctx
-    Nothing -> error $ "changeOne did not find " ++ s
-  where dim = Map.lookup s env
-
-change [] env ctx = ctx
-change ((s,v):subs) env ctx = changeOne s v env $ change subs env ctx
-
-flatten' set0 env ctx =
-  Map.foldlWithKey lookAtOne (set0, Map.fromList []) env
-  where
-    lookAtOne (set, m) key val
-      | Set.member key set = (set, m)
-      | otherwise = case val of
-                      Just (TLdim i) ->
-                        case ord of
-                          Just j -> (Set.insert key set, Map.insert key j m)
-                          Nothing -> error ("lookAtOne could not find " ++
-                                            (show i))
-                        where ord = Map.lookup i ctx
-                      _ -> (set, m)
-                    where val = Map.lookup key env
-
-flatten env ctx = foldl Map.union Map.empty (flatten' Set.empty env ctx)
-
-unflatten' ctx n =
-  Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
-  where
-    lookAtOne (env', ctx', n') key ord =
-      (Map.insert key (TLdim n') env', Map.insert n' ord ctx', n'+1)
-
-unflatten ctx n = (env', ctx')
-  where
-    (env', ctx', n') = unflatten' ctx n
-
 data TLdata = TLbool Bool
             | TLchar Char
             | TLint Integer
             | TLstr String
-            | TLfunc ([String] -> [TLexpr] -> Env -> Ctx -> TLdata)
+            | TLfunc ([String] -> [TLexpr] -> TLenv -> TLctx -> TLdata)
 
 instance Show TLdata where
   show (TLbool b) = "TLbool " ++ (show b)
@@ -86,20 +34,6 @@ instance Show TLdata where
   show (TLint i) = "TLint " ++ (show i)
   show (TLstr s) = "TLstr " ++ (show s)
   show (TLfunc f) = "TLfunc"
-
-data TLdecl = TLdeclDim (String, TLexpr)
-            | TLdeclVar (String, TLexpr)
-            | TLdeclFunc (String, [String], [String], TLexpr)
-  deriving Show
-
-isDeclDim (TLdeclDim _) = True
-isDeclDim _             = False
-
-isDeclVar (TLdeclVar _) = True
-isDeclVar _             = False
-
-isDeclFunc (TLdeclFunc _) = True
-isDeclFunc _              = False
 
 data TLuno = TLunNot
            | TLunNegate
@@ -120,6 +54,11 @@ data TLduo = TLbinAnd
            | TLbinEQ
            | TLbinNE
   deriving (Show)
+
+data TLdecl = TLdeclDim (String, TLexpr)
+            | TLdeclVar (String, TLexpr)
+            | TLdeclFunc (String, [String], [String], TLexpr)
+  deriving Show
 
 data TLexpr = TLconst TLdata
             | TLarray1 String
@@ -153,68 +92,62 @@ data TLexpr = TLconst TLdata
             | TLapply TLexpr [String] [TLexpr]
   deriving (Show)
 
-data TLenv = TLdim Integer
-           | TLenvExpr TLexpr
-           | TLenvBinding [String] TLexpr Env Ctx
+data TLenvEntry = TLdim Integer
+                | TLenvExpr TLexpr
+                | TLenvBinding [String] TLexpr TLenv TLctx
 
 data TLeval = TLevalVar String (Map.Map String TLdata)
             | TLevalExpr TLexpr (Map.Map String TLdata)
   deriving (Show)
 
-isEvalVar (TLevalVar _ _) = True
-isEvalVar _               = False
-
-isEvalExpr (TLevalExpr _ _) = True
-isEvalExpr _                = False
+type TLctx = Map.Map Integer TLdata
+type TLenv = Map.Map String TLenvEntry
 
 data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval] [TLeval]
   deriving (Show)
 
-findVar s env =
-  case expr of
-    Just e -> e
-    Nothing -> error $ "findVar did not find " ++ s
-  where expr = Map.lookup s env
+evalFile (TLfile dims vars funcs evalVars evalExprs) =
+  map (\(TLevalExpr e flatCtx) ->
+       let (env,ctx) = ctxFromAPI flatCtx 0 in
+       eval (TLwhere dims vars funcs e) env ctx)
+      evalExprs
 
-removeJust (Just (TLint i)) = i
+eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
-eval :: TLexpr -> Env -> Ctx -> TLdata
-
-eval (TLhash s) env ctx = find s env ctx
+eval (TLhash d) env ctx = ctxLookup d env ctx
 eval (TLat args arg) env ctx =
-  eval arg env (change (evalPair args env ctx) env ctx)
+  eval arg env (ctxPerturb (evalPair args env ctx) env ctx)
   where
     evalPair [] env ctx = []
-    evalPair ((s,ordinate):args) env ctx =
-      (s, eval ordinate env ctx):(evalPair args env ctx)
+    evalPair ((d,expr):args) env ctx =
+      (d, eval expr env ctx):(evalPair args env ctx)
 
-eval (TLvar s) env ctx =
-  case looked of
-    TLdim a -> error $ "Dimension used as variable: " ++ s
-    TLenvExpr e -> eval e env ctx
-    TLenvBinding dims e envBind ctxBind ->
-      eval e envBind
-           (change (map (\s -> (s, eval (TLhash s) env ctx)) dims)
-                        envBind ctxBind)
-  where looked = findVar s env
+eval (TLvar x) env ctx =
+  case envEntry of
+    TLdim loc -> error $ "Dimension used as variable: " ++ x
+    TLenvExpr expr -> eval expr env ctx
+    TLenvBinding dims expr envBind ctxBind ->
+      eval expr envBind
+           (ctxPerturb (map (\d -> (d, eval (TLhash d) env ctx)) dims)
+                       envBind ctxBind)
+  where envEntry = envLookup x env
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
-  eval
-    expr
-    (Map.union
-     (Map.union
-      (Map.fromList (map (\(TLdeclDim (s,expr),rk) -> (s, TLdim rk)) triples))
-      (Map.union
-       (Map.fromList (map (\(TLdeclVar (x,e)) -> (x, TLenvExpr e)) varDecls))
-       (Map.fromList (map (\(TLdeclFunc (f,dims,vars,e)) ->
-                          (f, TLenvExpr (TLlambda dims vars e))) funcDecls))))
-     env)
-    (Map.union
-     (Map.fromList (map (\(TLdeclDim (s,expr),rk) -> (rk, eval expr env ctx))
-                    triples))
-     ctx)
+  eval expr
+       (Map.union (Map.union envDims (Map.union envVars envFuncs)) env)
+       (Map.union ctxDims ctx)
   where
-    triples = zip dimDecls [1 + rank ctx ..]
+    triples  = zip dimDecls [1 + ctxRank ctx ..]
+    envDims  = Map.fromList
+                 (map (\(TLdeclDim (d,expr),rk) -> (d, TLdim rk)) triples)
+    envVars  = Map.fromList
+                 (map (\(TLdeclVar (x,e)) -> (x, TLenvExpr e)) varDecls)
+    envFuncs = Map.fromList
+                 (map (\(TLdeclFunc (f,dims,vars,e)) ->
+                      (f, TLenvExpr (TLlambda dims vars e))) funcDecls)
+    ctxDims  = Map.fromList
+                 (map (\(TLdeclDim (d,expr),rk) -> (rk, eval expr env ctx))
+                      triples)
 
 eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
@@ -226,69 +159,67 @@ eval (TLlambda dimArgs varArgs expr) env ctx =
   TLfunc
   (\dimActuals -> \exprActuals -> \envActuals -> \ctxActuals ->
    let
-     maxRank = max (rank ctx) (rank ctxActuals)
+     maxRank = max (ctxRank ctx) (ctxRank ctxActuals)
      triples = zip (zip dimArgs dimActuals) [1 + maxRank ..]
      pairs = zip varArgs exprActuals
-     ctx' = (Map.union
-             (Map.fromList (map (\((d,d'),rk) ->
-                                (rk, find d' envActuals ctxActuals)) triples))
-             ctx)
-     envActuals' = (Map.union
-                    (Map.fromList (map (\((d,d'),rk) ->
-                                       (d', TLdim rk)) triples))
-                    envActuals)
-     env' = (Map.union
-             (Map.union
-              (Map.fromList (map (\((d,d'),rk) ->
-                                 (d, TLdim rk)) triples))
-              (Map.fromList (map (\(x,e) ->
-                                 (x, TLenvBinding dimArgs e envActuals'
-                                                  ctxActuals)) pairs)))
-             env)
-   in eval expr env' ctx'
-  )
+     ctxDims = Map.fromList
+                 (map (\((d,d'),rk) ->
+                      (rk, ctxLookup d' envActuals ctxActuals)) triples)
+     ctx' = Map.union ctxDims ctx
+     envActualsDims = Map.fromList
+                        (map (\((d,d'),rk) -> (d', TLdim rk)) triples)
+     envActuals' = (Map.union envActualsDims envActuals)
+     envDims = Map.fromList
+                 (map (\((d,d'),rk) -> (d, TLdim rk)) triples)
+     envBindings = Map.fromList
+                     (map (\(x,expr) ->
+                           (x, TLenvBinding dimArgs expr
+                               envActuals' ctxActuals))
+                          pairs)
+     env' = (Map.union (Map.union envDims envBindings) env)
+   in eval expr env' ctx')
 
 eval (TLconst c) env ctx = c
 
 eval (TLarray1 str arr) env ctx =
    (Array.!) arr tupleIdx
    where
-     flatCtx = flatten env ctx
-     tupleIdx = removeJust $ Map.lookup str flatCtx
+     ctxAPI = ctxToAPI env ctx
+     tupleIdx = removeJust $ Map.lookup str ctxAPI
 
 eval (TLarray2 (str1,str2) arr) env ctx =
    (Array.!) arr tupleIdx
    where
-     flatCtx = flatten env ctx
-     tupleIdx = (removeJust $ Map.lookup str1 flatCtx,
-                 removeJust $ Map.lookup str2 flatCtx)
+     ctxAPI = ctxToAPI env ctx
+     tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
+                 removeJust $ Map.lookup str2 ctxAPI)
 
 eval (TLarray3 (str1,str2,str3) arr) env ctx =
    (Array.!) arr tupleIdx
    where
-     flatCtx = flatten env ctx
-     tupleIdx = (removeJust $ Map.lookup str1 flatCtx,
-                 removeJust $ Map.lookup str2 flatCtx,
-                 removeJust $ Map.lookup str3 flatCtx)
+     ctxAPI = ctxToAPI env ctx
+     tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
+                 removeJust $ Map.lookup str2 ctxAPI,
+                 removeJust $ Map.lookup str3 ctxAPI)
 
 eval (TLarray4 (str1,str2,str3,str4) arr) env ctx =
    (Array.!) arr tupleIdx
    where
-     flatCtx = flatten env ctx
-     tupleIdx = (removeJust $ Map.lookup str1 flatCtx,
-                 removeJust $ Map.lookup str2 flatCtx,
-                 removeJust $ Map.lookup str3 flatCtx,
-                 removeJust $ Map.lookup str4 flatCtx)
+     ctxAPI = ctxToAPI env ctx
+     tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
+                 removeJust $ Map.lookup str2 ctxAPI,
+                 removeJust $ Map.lookup str3 ctxAPI,
+                 removeJust $ Map.lookup str4 ctxAPI)
 
 eval (TLarray5 (str1,str2,str3,str4,str5) arr) env ctx =
    (Array.!) arr tupleIdx
    where
-     flatCtx = flatten env ctx
-     tupleIdx = (removeJust $ Map.lookup str1 flatCtx,
-                 removeJust $ Map.lookup str2 flatCtx,
-                 removeJust $ Map.lookup str3 flatCtx,
-                 removeJust $ Map.lookup str4 flatCtx,
-                 removeJust $ Map.lookup str5 flatCtx)
+     ctxAPI = ctxToAPI env ctx
+     tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
+                 removeJust $ Map.lookup str2 ctxAPI,
+                 removeJust $ Map.lookup str3 ctxAPI,
+                 removeJust $ Map.lookup str4 ctxAPI,
+                 removeJust $ Map.lookup str5 ctxAPI)
 
 eval (TLcond arg1 arg2 arg3) env ctx =
   case val1 of
@@ -372,8 +303,77 @@ evalBinopRel op arg1 arg2 env ctx =
     _                    -> error "Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
-evalFile (TLfile dims vars funcs evalVars evalExprs) =
-  map (\(TLevalExpr e flatCtx) ->
-       let (env,ctx) = unflatten flatCtx 0 in
-       eval (TLwhere dims vars funcs e) env ctx)
-      evalExprs
+ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
+
+ctxLookupOrd loc ctx =
+  case ord of
+    Just v -> v
+    Nothing -> error $ "ctxLookupOrd did not find" ++ (show loc)
+  where ord = Map.lookup loc ctx
+
+ctxLookup d env ctx =
+  case dim of
+    Just (TLdim loc) -> ctxLookupOrd loc ctx
+    Nothing -> error $ "ctxLookup did not find " ++ d
+    _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
+  where dim = Map.lookup d env
+
+ctxPerturbOne d v env ctx =
+  case dim of
+    Just (TLdim loc) -> Map.insert loc v ctx
+    Nothing -> error $ "ctxPerturbOne did not find " ++ d
+  where dim = Map.lookup d env
+
+ctxPerturb [] env ctx = ctx
+ctxPerturb ((d,v):subs) env ctx =
+  ctxPerturbOne d v env $ ctxPerturb subs env ctx
+
+ctxToAPI' set0 env ctx =
+  Map.foldlWithKey lookAtOne (set0, Map.fromList []) env
+  where
+    lookAtOne (set, m) key val
+      | Set.member key set = (set, m)
+      | otherwise = case val of
+                      Just (TLdim i) ->
+                        case ord of
+                          Just j -> (Set.insert key set, Map.insert key j m)
+                          Nothing -> error ("lookAtOne could not find " ++
+                                            (show i))
+                        where ord = Map.lookup i ctx
+                      _ -> (set, m)
+                    where val = Map.lookup key env
+
+ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
+
+ctxFromAPI' ctx n =
+  Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
+  where
+    lookAtOne (env', ctx', n') key ord =
+      (Map.insert key (TLdim n') env', Map.insert n' ord ctx', n'+1)
+
+ctxFromAPI ctx n = (env', ctx')
+  where
+    (env', ctx', n') = ctxFromAPI' ctx n
+
+envLookup x env =
+  case expr of
+    Just e -> e
+    Nothing -> error $ "envLookup did not find " ++ x
+  where expr = Map.lookup x env
+
+isDeclDim (TLdeclDim _) = True
+isDeclDim _             = False
+
+isDeclVar (TLdeclVar _) = True
+isDeclVar _             = False
+
+isDeclFunc (TLdeclFunc _) = True
+isDeclFunc _              = False
+
+isEvalVar (TLevalVar _ _) = True
+isEvalVar _               = False
+
+isEvalExpr (TLevalExpr _ _) = True
+isEvalExpr _                = False
+
+removeJust (Just (TLint i)) = i
