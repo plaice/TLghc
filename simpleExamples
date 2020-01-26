@@ -18,9 +18,11 @@ fun upon.d(X,Y) = X [d <- W]
   end
 
 dim d <- -42
+dim d0 <- 0
+dim d1 <- 1
 var A = 1 + 2 + #d
 var X = 0 fby.d X+1
 var Y = Y-1 ybf.d 0
 
 evalExpr X @ [d <- -2 .. 2]
-evalExpr Y @ [d <- -2 .. 2]
+evalExpr Y @ [d <- -2 .. 2, d0 <- -1 .. 1, d1 <- -1 .. 1]

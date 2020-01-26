@@ -1,4 +1,4 @@
-module TLparse (playFile,parserFile,playExpr,parserExpr)
+module TLparse (playFile,parserFile)
 where
 
 import Text.Parsec
@@ -10,10 +10,9 @@ import qualified Data.Array as Array
 import qualified Data.Map as Map
 import TL
 
-playFile :: String -> IO ()
 playFile inp = case parse parserFile "" inp of
-                 Left err -> print err
-                 Right ans -> print (evalFile ans)
+                 Left err -> error "playFile: parse failed"
+                 Right ans -> evalFile ans
 
 parserFile :: Parser TLfile
 parserFile =
@@ -24,11 +23,6 @@ parserFile =
     let funcs = filter isDeclFunc decls
     evalExprs <- many parserEvalExpr
     return (TLfile dims vars funcs evalExprs)
-
-playExpr :: String -> IO ()
-playExpr inp = case parse parserExpr "" inp of
-                 Left err -> print err
-                 Right ans -> print ans
 
 parserExpr :: Parser TLexpr
 parserExpr = parserExprSimple

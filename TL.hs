@@ -113,14 +113,44 @@ getDims [] = []
 getDims ((d,(min,max)):ranges) =
  (d,TLint 0):(getDims ranges)
 
+foldPairs [] = ""
+foldPairs ((d,TLconst (TLint i)):[]) = d ++ " <- " ++ (show i)
+foldPairs ((d,TLconst (TLint i)):l) = d ++ " <- " ++ (show i) ++ ", " ++ (foldPairs l)
+
+fixPrefixOne c [] = " "
+fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
+fixPrefixOne '-' (c:pairs) = '-':c:pairs
+fixPrefixOne _ (c:pairs) = ' ':c:pairs
+
+removePrefixOne [] l = l
+removePrefixOne l [] = []
+removePrefixOne (c:pairs) (c':pairs')
+  | c == c' = let newPairs = removePrefixOne pairs pairs' in
+              fixPrefixOne c newPairs
+  | otherwise = (c':pairs')
+
+removePrefix' pairs [] = []
+removePrefix' pairs (pairs':l) = (removePrefixOne pairs pairs'):(removePrefix' pairs' l)
+
+removePrefix [] = []
+removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
+
 evalFile (TLfile dims vars funcs evalExprs) =
-  map (\(TLevalExpr expr ctxRange) ->
-       let expandedRanges = expandRange ctxRange in
-       let externDims = Map.fromList $ getDims ctxRange in
-       let (env,ctx) = ctxFromAPI externDims 0 in
-       map (\pairs -> eval (TLwhere dims vars funcs (TLat pairs expr)) env ctx)
-           expandedRanges)
-      evalExprs
+  mapM_ (\(TLevalExpr expr ctxRange) ->
+                   let expandedRanges = expandRange ctxRange in
+                   let rangeTexts = removePrefix (map foldPairs expandedRanges) in
+                   let externDims = Map.fromList $ getDims ctxRange in
+                   let (env,ctx) = ctxFromAPI externDims 0 in
+                   do
+                     putStrLn . show $ expr
+                     mapM_ (\(text,pairs) ->
+                            do putStr "  "
+                               putStr $ id text
+                               putStr ": "
+                               putStrLn . show $
+                                 eval (TLwhere dims vars funcs (TLat pairs expr)) env ctx)
+                            (zip rangeTexts expandedRanges))
+              evalExprs
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
