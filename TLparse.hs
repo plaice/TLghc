@@ -26,6 +26,8 @@ parserFile =
 
 parserExpr :: Parser TLexpr
 parserExpr = parserExprSimple
+         <|> parserExprApplyIndex
+         <|> parserExprApplyArgs
          <|> parserExprApply
          <|> parserExprWhere
 
@@ -38,7 +40,13 @@ parserDecl =
           decl <- parserDeclVar
           return decl
     <|> do
-          decl <- parserDeclFunc
+          decl <- parserDeclVarIndex
+          return decl
+    <|> do
+          decl <- parserDeclFun
+          return decl
+    <|> do
+          decl <- parserDeclFunIndex
           return decl
 
 parserDeclDim :: Parser TLdecl
@@ -52,24 +60,50 @@ parserDeclDim =
 
 parserDeclVar :: Parser TLdecl
 parserDeclVar =
-  do
-    m_reserved "var"
-    x <- m_identifier
-    m_reservedOp "="
-    expr <- parserExpr
-    return (TLdeclVar x expr)
+  try (do
+         m_reserved "var"
+         x <- m_identifier
+         m_reservedOp "="
+         expr <- parserExpr
+         return (TLdeclVar x expr)
+      )
 
-parserDeclFunc :: Parser TLdecl
-parserDeclFunc =
-  do
-    m_reserved "fun"
-    f <- m_identifier
-    m_reservedOp "."
-    dimArgs <- parserIds
-    varArgs <- m_parens parserIds
-    m_reservedOp "="
-    arg <- parserExpr
-    return (TLdeclFunc f dimArgs varArgs arg)
+parserDeclVarIndex :: Parser TLdecl
+parserDeclVarIndex =
+  try (do
+         m_reserved "var"
+         x <- m_identifier
+         m_reservedOp "."
+         dimArgs <- parserIdsDots
+         m_reservedOp "="
+         expr <- parserExpr
+         return (TLdeclFunc x dimArgs [] expr)
+      )
+
+parserDeclFun :: Parser TLdecl
+parserDeclFun =
+  try (do
+         m_reserved "var"
+         x <- m_identifier
+         m_reservedOp "."
+         varArgs <- m_parens parserIds
+         m_reservedOp "="
+         expr <- parserExpr
+         return (TLdeclFunc x [] varArgs expr)
+      )
+
+parserDeclFunIndex :: Parser TLdecl
+parserDeclFunIndex =
+  try (do
+         m_reserved "var"
+         x <- m_identifier
+         m_reservedOp "."
+         dimArgs <- parserIdsDots
+         varArgs <- m_parens parserIds
+         m_reservedOp "="
+         expr <- parserExpr
+         return (TLdeclFunc x dimArgs varArgs expr)
+      )
 
 parserEvalExpr :: Parser TLeval
 parserEvalExpr =
@@ -109,14 +143,37 @@ parserExprSimple =
   try (do
          arg <- parserExprOps
          notFollowedBy (m_reservedOp ".")
+         notFollowedBy (m_reservedOp "(")
          notFollowedBy (m_reserved "where")
          return arg
+      )
+
+parserExprApplyIndex :: Parser TLexpr
+parserExprApplyIndex =
+  try (do
+         func <- parserExprOps
+         notFollowedBy (m_reserved "where")
+         m_reservedOp "."
+         dimActuals <- parserIdsDots
+         notFollowedBy (m_reservedOp "(")
+         return (TLapply func dimActuals [])
+      )
+
+parserExprApplyArgs :: Parser TLexpr
+parserExprApplyArgs =
+  try (do
+         func <- parserExprOps
+         notFollowedBy (m_reservedOp ".")
+         notFollowedBy (m_reserved "where")
+         exprActuals <- m_parens parserExprs
+         return (TLapply func [] exprActuals)
       )
 
 parserExprApply :: Parser TLexpr
 parserExprApply =
   try (do
          func <- parserExprOps
+         notFollowedBy (m_reservedOp "(")
          notFollowedBy (m_reserved "where")
          m_reservedOp "."
          dimActuals <- parserIdsDots
