@@ -157,113 +157,6 @@ parserRange =
     max <- m_integer
     return (dim,min,max)
 
-processArray [(dim1, min1, max1)] datas
-  | (toInteger . length $ datas) /=
-    size1 =
-    error "Array1 not the correct length"
-  | otherwise = TLarray1 dim1
-                         (Array.array
-                          (min1, max1)
-                          [(i, datas !! (fromInteger (i-min1))) |
-                           i <- [min1 .. max1]])
-  where size1 = max1 - min1 + 1
-
-processArray [(dim1, min1, max1),
-              (dim2, min2, max2)] datas
-  | (toInteger . length $ datas) /=
-    (size1 * size2) =
-    error "Array2 not the correct length"
-  | otherwise = TLarray2 (dim1, dim2)
-                         (Array.array
-                          ((min1, min2),
-                           (max1, max2))
-                          [((i1,i2), datas !! (fromInteger d)) |
-                           i1 <- [min1 .. max1],
-                           i2 <- [min2 .. max2],
-                           let d = (i2-min2) + size2 *
-                                   (i1-min1)
-                          ])
-  where size1 = max1 - min1 + 1
-        size2 = max2 - min2 + 1
-
-processArray [(dim1, min1, max1),
-              (dim2, min2, max2),
-              (dim3, min3, max3)] datas
-  | (toInteger . length $ datas) /=
-    (size1 * size2 * size3) =
-    error "Array3 not the correct length"
-  | otherwise = TLarray3 (dim1, dim2, dim3)
-                         (Array.array
-                          ((min1, min2, min3),
-                           (max1, max2, max3))
-                          [((i1,i2,i3), datas !! (fromInteger d)) |
-                           i1 <- [min1 .. max1],
-                           i2 <- [min2 .. max2],
-                           i3 <- [min3 .. max3],
-                           let d = (i3-min3) + size3 *
-                                   ((i2-min2) + size2 *
-                                    (i1-min1))
-                          ])
-  where size1 = max1 - min1 + 1
-        size2 = max2 - min2 + 1
-        size3 = max3 - min3 + 1
-
-processArray [(dim1, min1, max1),
-              (dim2, min2, max2),
-              (dim3, min3, max3),
-              (dim4, min4, max4)] datas
-  | (toInteger . length $ datas) /=
-    (size1 * size2 * size3 * size4) =
-    error "Array4 not the correct length"
-  | otherwise = TLarray4 (dim1, dim2, dim3, dim4)
-                         (Array.array
-                          ((min1, min2, min3, min4),
-                           (max1, max2, max3, max4))
-                          [((i1,i2,i3,i4), datas !! (fromInteger d)) |
-                           i1 <- [min1 .. max1],
-                           i2 <- [min2 .. max2],
-                           i3 <- [min3 .. max3],
-                           i4 <- [min4 .. max4],
-                           let d = (i4-min4) + size4 *
-                                   ((i3-min3) + size3 *
-                                    ((i2-min2) + size2 *
-                                     (i1-min1)))
-                          ])
-  where size1 = max1 - min1 + 1
-        size2 = max2 - min2 + 1
-        size3 = max3 - min3 + 1
-        size4 = max4 - min4 + 1
-
-processArray [(dim1, min1, max1),
-              (dim2, min2, max2),
-              (dim3, min3, max3),
-              (dim4, min4, max4),
-              (dim5, min5, max5)] datas
-  | (toInteger . length $ datas) /=
-    (size1 * size2 * size3 * size4 * size5) =
-    error "Array5 not the correct length"
-  | otherwise = TLarray5 (dim1, dim2, dim3, dim4, dim5)
-                         (Array.array
-                          ((min1, min2, min3, min4, min5),
-                           (max1, max2, max3, max4, max5))
-                          [((i1,i2,i3,i4,i5), datas !! (fromInteger d)) |
-                           i1 <- [min1 .. max1],
-                           i2 <- [min2 .. max2],
-                           i3 <- [min3 .. max3],
-                           i4 <- [min4 .. max4],
-                           i5 <- [min5 .. max5],
-                           let d = (i5-min5) + size5 *
-                                   ((i4-min4) + size4 *
-                                    ((i3-min3) + size3 *
-                                     ((i2-min2) + size2 *
-                                      (i1-min1))))
-                          ])
-  where size1 = max1 - min1 + 1
-        size2 = max2 - min2 + 1
-        size3 = max3 - min3 + 1
-        size4 = max4 - min4 + 1
-        size5 = max5 - min5 + 1
-
 parserArray :: Parser TLexpr
 parserArray =
   do
@@ -442,4 +335,110 @@ playFile :: String -> IO ()
 playFile inp = case parse parserFile "" inp of
              Left err -> print err
              Right ans -> print (evalFile ans)
-             --Right ans -> print ("evalFile: " ++ show(ans))
+
+processArray [(dim1, min1, max1)] datas
+  | (toInteger . length $ datas) /=
+    size1 =
+    error "Array1 not the correct length"
+  | otherwise = TLarray1 dim1
+                         (Array.array
+                          (min1, max1)
+                          [(i, datas !! (fromInteger (i-min1))) |
+                           i <- [min1 .. max1]])
+  where size1 = max1 - min1 + 1
+
+processArray [(dim1, min1, max1),
+              (dim2, min2, max2)] datas
+  | (toInteger . length $ datas) /=
+    (size1 * size2) =
+    error "Array2 not the correct length"
+  | otherwise = TLarray2 (dim1, dim2)
+                         (Array.array
+                          ((min1, min2),
+                           (max1, max2))
+                          [((i1,i2), datas !! (fromInteger d)) |
+                           i1 <- [min1 .. max1],
+                           i2 <- [min2 .. max2],
+                           let d = (i2-min2) + size2 *
+                                   (i1-min1)
+                          ])
+  where size1 = max1 - min1 + 1
+        size2 = max2 - min2 + 1
+
+processArray [(dim1, min1, max1),
+              (dim2, min2, max2),
+              (dim3, min3, max3)] datas
+  | (toInteger . length $ datas) /=
+    (size1 * size2 * size3) =
+    error "Array3 not the correct length"
+  | otherwise = TLarray3 (dim1, dim2, dim3)
+                         (Array.array
+                          ((min1, min2, min3),
+                           (max1, max2, max3))
+                          [((i1,i2,i3), datas !! (fromInteger d)) |
+                           i1 <- [min1 .. max1],
+                           i2 <- [min2 .. max2],
+                           i3 <- [min3 .. max3],
+                           let d = (i3-min3) + size3 *
+                                   ((i2-min2) + size2 *
+                                    (i1-min1))
+                          ])
+  where size1 = max1 - min1 + 1
+        size2 = max2 - min2 + 1
+        size3 = max3 - min3 + 1
+
+processArray [(dim1, min1, max1),
+              (dim2, min2, max2),
+              (dim3, min3, max3),
+              (dim4, min4, max4)] datas
+  | (toInteger . length $ datas) /=
+    (size1 * size2 * size3 * size4) =
+    error "Array4 not the correct length"
+  | otherwise = TLarray4 (dim1, dim2, dim3, dim4)
+                         (Array.array
+                          ((min1, min2, min3, min4),
+                           (max1, max2, max3, max4))
+                          [((i1,i2,i3,i4), datas !! (fromInteger d)) |
+                           i1 <- [min1 .. max1],
+                           i2 <- [min2 .. max2],
+                           i3 <- [min3 .. max3],
+                           i4 <- [min4 .. max4],
+                           let d = (i4-min4) + size4 *
+                                   ((i3-min3) + size3 *
+                                    ((i2-min2) + size2 *
+                                     (i1-min1)))
+                          ])
+  where size1 = max1 - min1 + 1
+        size2 = max2 - min2 + 1
+        size3 = max3 - min3 + 1
+        size4 = max4 - min4 + 1
+
+processArray [(dim1, min1, max1),
+              (dim2, min2, max2),
+              (dim3, min3, max3),
+              (dim4, min4, max4),
+              (dim5, min5, max5)] datas
+  | (toInteger . length $ datas) /=
+    (size1 * size2 * size3 * size4 * size5) =
+    error "Array5 not the correct length"
+  | otherwise = TLarray5 (dim1, dim2, dim3, dim4, dim5)
+                         (Array.array
+                          ((min1, min2, min3, min4, min5),
+                           (max1, max2, max3, max4, max5))
+                          [((i1,i2,i3,i4,i5), datas !! (fromInteger d)) |
+                           i1 <- [min1 .. max1],
+                           i2 <- [min2 .. max2],
+                           i3 <- [min3 .. max3],
+                           i4 <- [min4 .. max4],
+                           i5 <- [min5 .. max5],
+                           let d = (i5-min5) + size5 *
+                                   ((i4-min4) + size4 *
+                                    ((i3-min3) + size3 *
+                                     ((i2-min2) + size2 *
+                                      (i1-min1))))
+                          ])
+  where size1 = max1 - min1 + 1
+        size2 = max2 - min2 + 1
+        size3 = max3 - min3 + 1
+        size4 = max4 - min4 + 1
+        size5 = max5 - min5 + 1
