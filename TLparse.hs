@@ -194,6 +194,7 @@ table = [ [ parserUnop  "!"  TLunNot
         , [ parserBinop "||" TLbinOr AssocLeft ]
         , [ parserTLop "fby"
           , parserTLop "ybf"
+          , parserTLop "asa"
           , parserTLop "wvr"
           , parserTLop "upon"
           ]

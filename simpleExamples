@@ -6,9 +6,30 @@ fun ybf.d(X,Y) = if #d > -1 then Y else X [d <- #d + 1]
 fun lPair.d(X) = X [d <- #d * 2]
 fun rPair.d(X) = X [d <- #d * 2 + 1]
 
-dim d <- 42
+fun asa.d(X,Y) = first.d (X wvr.d Y)
+fun wvr.d(X,Y) = X [d <- T]
+  where
+    var T = U fby.d U [d <- T+1]
+    var U = if Y then #d else next.d(U)
+  end
+fun upon.d(X,Y) = X [d <- W]
+  where
+    var W = 0 fby.d if Y then W+1 else W
+  end
+
+dim d <- -42
 var A = 1 + 2 + #d
 var X = 0 fby.d X+1
+var Y = Y-1 ybf.d 0
 
 evalExpr next.d(A) @ []
-evalExpr X @ []
+evalExpr X[d <- -2] @ []
+evalExpr X[d <- -1] @ []
+evalExpr X[d <- 0] @ []
+evalExpr X[d <- 1] @ []
+evalExpr X[d <- 2] @ []
+evalExpr Y[d <- -2] @ []
+evalExpr Y[d <- -1] @ []
+evalExpr Y[d <- 0] @ []
+evalExpr Y[d <- 1] @ []
+evalExpr Y[d <- 2] @ []
