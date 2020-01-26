@@ -22,14 +22,5 @@ var A = 1 + 2 + #d
 var X = 0 fby.d X+1
 var Y = Y-1 ybf.d 0
 
-evalExpr next.d(A) @ []
-evalExpr X[d <- -2] @ []
-evalExpr X[d <- -1] @ []
-evalExpr X[d <- 0] @ []
-evalExpr X[d <- 1] @ []
-evalExpr X[d <- 2] @ []
-evalExpr Y[d <- -2] @ []
-evalExpr Y[d <- -1] @ []
-evalExpr Y[d <- 0] @ []
-evalExpr Y[d <- 1] @ []
-evalExpr Y[d <- 2] @ []
+evalExpr X @ [d <- -2 .. 2]
+evalExpr Y @ [d <- -2 .. 2]

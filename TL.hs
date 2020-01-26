@@ -10,9 +10,9 @@ module TL (
          TLvar, TLwhere, TLfn, TLapply),
   TLdecl(TLdeclDim, TLdeclVar, TLdeclFunc),
   TLenvEntry(TLdim, TLenvExpr, TLenvBinding),
-  TLeval(TLevalVar,TLevalExpr),
+  TLeval(TLevalExpr),
   TLfile(TLfile),
-  isDeclDim,isDeclVar,isDeclFunc,isEvalVar,isEvalExpr
+  isDeclDim,isDeclVar,isDeclFunc
   ,eval
   ,evalFile
 )
@@ -96,20 +96,30 @@ data TLenvEntry = TLdim Integer
                 | TLenvExpr TLexpr
                 | TLenvBinding [String] TLexpr TLenv TLctx
 
-data TLeval = TLevalVar String (Map.Map String TLdata)
-            | TLevalExpr TLexpr (Map.Map String TLdata)
+data TLeval = TLevalExpr TLexpr [(String,(Integer,Integer))]
   deriving (Show)
 
 type TLctx = Map.Map Integer TLdata
 type TLenv = Map.Map String TLenvEntry
 
-data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval] [TLeval]
+data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
   deriving (Show)
 
-evalFile (TLfile dims vars funcs evalVars evalExprs) =
-  map (\(TLevalExpr e flatCtx) ->
-       let (env,ctx) = ctxFromAPI flatCtx 0 in
-       eval (TLwhere dims vars funcs e) env ctx)
+expandRange [] = [[]]
+expandRange ((d,(min,max)):ranges) =
+ [(d,TLconst (TLint i)):l | i <- [min..max], l <- expandRange ranges]
+
+getDims [] = []
+getDims ((d,(min,max)):ranges) =
+ (d,TLint 0):(getDims ranges)
+
+evalFile (TLfile dims vars funcs evalExprs) =
+  map (\(TLevalExpr expr ctxRange) ->
+       let expandedRanges = expandRange ctxRange in
+       let externDims = Map.fromList $ getDims ctxRange in
+       let (env,ctx) = ctxFromAPI externDims 0 in
+       map (\pairs -> eval (TLwhere dims vars funcs (TLat pairs expr)) env ctx)
+           expandedRanges)
       evalExprs
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
@@ -369,11 +379,5 @@ isDeclVar _               = False
 
 isDeclFunc (TLdeclFunc _ _ _ _) = True
 isDeclFunc _                    = False
-
-isEvalVar (TLevalVar _ _) = True
-isEvalVar _               = False
-
-isEvalExpr (TLevalExpr _ _) = True
-isEvalExpr _                = False
 
 removeJust (Just (TLint i)) = i

@@ -22,10 +22,8 @@ parserFile =
     let dims = filter isDeclDim decls
     let vars = filter isDeclVar decls
     let funcs = filter isDeclFunc decls
-    evals <- many parserEval
-    let evalVars = filter isEvalVar evals
-    let evalExprs = filter isEvalExpr evals
-    return (TLfile dims vars funcs evalVars evalExprs)
+    evalExprs <- many parserEvalExpr
+    return (TLfile dims vars funcs evalExprs)
 
 playExpr :: String -> IO ()
 playExpr inp = case parse parserExpr "" inp of
@@ -79,23 +77,14 @@ parserDeclFunc =
     arg <- parserExpr
     return (TLdeclFunc f dimArgs varArgs arg)
 
-parserEval :: Parser TLeval
-parserEval =
-        do
-          eval <- parserEvalExpr
-          return eval
-    <|> do
-          eval <- parserEvalVar
-          return eval
-
-parserEvalVar :: Parser TLeval
-parserEvalVar =
+parserEvalExpr :: Parser TLeval
+parserEvalExpr =
   do
-    m_reserved "evalVar"
-    var <- m_identifier
+    m_reserved "evalExpr"
+    expr <- parserExpr
     m_reservedOp "@"
     pairs <- m_brackets parserDataCtx
-    return (TLevalVar var (Map.fromList pairs))
+    return (TLevalExpr expr pairs)
 
 parserCtx :: Parser [(String, TLexpr)]
 parserCtx = m_commaSep1 parserCtxPair
@@ -108,25 +97,18 @@ parserCtxPair =
     expr <- parserExpr
     return (d, expr)
 
-parserEvalExpr :: Parser TLeval
-parserEvalExpr =
-  do
-    m_reserved "evalExpr"
-    expr <- parserExpr
-    m_reservedOp "@"
-    pairs <- m_brackets parserDataCtx
-    return (TLevalExpr expr (Map.fromList pairs))
-
-parserDataCtx :: Parser [(String, TLdata)]
+parserDataCtx :: Parser [(String, (Integer,Integer))]
 parserDataCtx = m_commaSep parserDataCtxPair
 
-parserDataCtxPair :: Parser (String, TLdata)
+parserDataCtxPair :: Parser (String, (Integer,Integer))
 parserDataCtxPair =
   do
     d <- m_identifier
     m_reservedOp "<-"
-    datum <- parserData
-    return (d, datum)
+    datumLow <- m_integer
+    m_reservedOp ".."
+    datumHigh <- m_integer
+    return (d, (datumLow, datumHigh))
 
 parserExprSimple :: Parser TLexpr
 parserExprSimple =
