@@ -52,8 +52,8 @@ parserCtxPair =
   do
     d <- m_identifier
     m_reservedOp "<-"
-    e <- parserExpr
-    return (d, e)
+    expr <- parserExpr
+    return (d, expr)
 
 parserCtx :: Parser [(String, TLexpr)]
 parserCtx = m_commaSep1 parserCtxPair
@@ -63,8 +63,8 @@ parserDataCtxPair =
   do
     d <- m_identifier
     m_reservedOp "<-"
-    e <- parserData
-    return (d, e)
+    datum <- parserData
+    return (d, datum)
 
 parserDataCtx :: Parser [(String, TLdata)]
 parserDataCtx = m_commaSep parserDataCtxPair
@@ -79,31 +79,31 @@ parserDeclDim :: Parser TLdecl
 parserDeclDim =
   do
     m_reserved "dim"
-    dim <- m_identifier
+    d <- m_identifier
     m_reservedOp "<-"
-    ordinate <- parserExpr
-    return (TLdeclDim (dim, ordinate))
+    expr <- parserExpr
+    return (TLdeclDim d expr)
 
 parserDeclVar :: Parser TLdecl
 parserDeclVar =
   do
     m_reserved "var"
-    var <- m_identifier
+    x <- m_identifier
     m_reservedOp "="
     expr <- parserExpr
-    return (TLdeclVar (var, expr))
+    return (TLdeclVar x expr)
 
 parserDeclFunc :: Parser TLdecl
 parserDeclFunc =
   do
     m_reserved "fun"
-    func <- m_identifier
+    f <- m_identifier
     m_reservedOp "."
     dimArgs <- parserIds
     varArgs <- m_parens parserIds
     m_reservedOp "="
     arg <- parserExpr
-    return (TLdeclFunc (func, dimArgs, varArgs, arg))
+    return (TLdeclFunc f dimArgs varArgs arg)
 
 parserDecl :: Parser TLdecl
 parserDecl =

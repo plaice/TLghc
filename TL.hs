@@ -55,9 +55,9 @@ data TLduo = TLbinAnd
            | TLbinNE
   deriving (Show)
 
-data TLdecl = TLdeclDim (String, TLexpr)
-            | TLdeclVar (String, TLexpr)
-            | TLdeclFunc (String, [String], [String], TLexpr)
+data TLdecl = TLdeclDim String TLexpr
+            | TLdeclVar String TLexpr
+            | TLdeclFunc String [String] [String] TLexpr
   deriving Show
 
 data TLexpr = TLconst TLdata
@@ -139,14 +139,14 @@ eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
   where
     triples  = zip dimDecls [1 + ctxRank ctx ..]
     envDims  = Map.fromList
-                 (map (\(TLdeclDim (d,expr),rk) -> (d, TLdim rk)) triples)
+                 (map (\(TLdeclDim d expr,rk) -> (d, TLdim rk)) triples)
     envVars  = Map.fromList
-                 (map (\(TLdeclVar (x,e)) -> (x, TLenvExpr e)) varDecls)
+                 (map (\(TLdeclVar x expr) -> (x, TLenvExpr expr)) varDecls)
     envFuncs = Map.fromList
-                 (map (\(TLdeclFunc (f,dims,vars,e)) ->
-                      (f, TLenvExpr (TLfn dims vars e))) funcDecls)
+                 (map (\(TLdeclFunc f dims vars expr) ->
+                      (f, TLenvExpr (TLfn dims vars expr))) funcDecls)
     ctxDims  = Map.fromList
-                 (map (\(TLdeclDim (d,expr),rk) -> (rk, eval expr env ctx))
+                 (map (\(TLdeclDim d expr,rk) -> (rk, eval expr env ctx))
                       triples)
 
 eval (TLapply func dimActuals exprActuals) env ctx =
@@ -361,14 +361,14 @@ envLookup x env =
     Nothing -> error $ "envLookup did not find " ++ x
   where expr = Map.lookup x env
 
-isDeclDim (TLdeclDim _) = True
-isDeclDim _             = False
+isDeclDim (TLdeclDim _ _) = True
+isDeclDim _               = False
 
-isDeclVar (TLdeclVar _) = True
-isDeclVar _             = False
+isDeclVar (TLdeclVar _ _) = True
+isDeclVar _               = False
 
-isDeclFunc (TLdeclFunc _) = True
-isDeclFunc _              = False
+isDeclFunc (TLdeclFunc _ _ _ _) = True
+isDeclFunc _                    = False
 
 isEvalVar (TLevalVar _ _) = True
 isEvalVar _               = False
