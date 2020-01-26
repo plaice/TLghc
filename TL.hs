@@ -7,7 +7,7 @@ module TL (
         TLbinLT, TLbinLE, TLbinGE, TLbinGT, TLbinEQ, TLbinNE),
   TLexpr(TLconst, TLarray1, TLarray2, TLarray3, TLarray4, TLarray5,
          TLunop, TLbinop, TLcond, TLhash, TLat,
-         TLvar, TLwhere, TLlambda, TLapply),
+         TLvar, TLwhere, TLfn, TLapply),
   TLdecl(TLdeclDim, TLdeclVar, TLdeclFunc),
   TLenvEntry(TLdim, TLenvExpr, TLenvBinding),
   TLeval(TLevalVar,TLevalExpr),
@@ -88,7 +88,7 @@ data TLexpr = TLconst TLdata
             | TLat [(String, TLexpr)] TLexpr
             | TLvar String
             | TLwhere [TLdecl] [TLdecl] [TLdecl] TLexpr
-            | TLlambda [String] [String] TLexpr
+            | TLfn [String] [String] TLexpr
             | TLapply TLexpr [String] [TLexpr]
   deriving (Show)
 
@@ -144,7 +144,7 @@ eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
                  (map (\(TLdeclVar (x,e)) -> (x, TLenvExpr e)) varDecls)
     envFuncs = Map.fromList
                  (map (\(TLdeclFunc (f,dims,vars,e)) ->
-                      (f, TLenvExpr (TLlambda dims vars e))) funcDecls)
+                      (f, TLenvExpr (TLfn dims vars e))) funcDecls)
     ctxDims  = Map.fromList
                  (map (\(TLdeclDim (d,expr),rk) -> (rk, eval expr env ctx))
                       triples)
@@ -155,7 +155,7 @@ eval (TLapply func dimActuals exprActuals) env ctx =
     _                 -> error "Type error"
   where funcEval = (eval func env ctx)
 
-eval (TLlambda dimArgs varArgs expr) env ctx =
+eval (TLfn dimArgs varArgs expr) env ctx =
   TLfunc
   (\dimActuals -> \exprActuals -> \envActuals -> \ctxActuals ->
    let

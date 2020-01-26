@@ -1,8 +1,10 @@
-fun first.d(X) = let d <- 0 in X
-fun next.d(X) = let d <- #d + 1 in X
-fun fby.d(X,Y) = if #d < 1 then X else let d <- #d - 1 in Y
-fun lPair.d(X) = let d <- #d * 2 in X
-fun rPair.d(X) = let d <- #d * 2 + 1 in X
+fun first.d(X) = X [d <- 0]
+fun next.d(X)  = X [d <- #d + 1]
+fun prev.d(X)  = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else Y [d <- #d - 1]
+fun ybf.d(X,Y) = if #d > -1 then Y else X [d <- #d + 1]
+fun lPair.d(X) = X [d <- #d * 2]
+fun rPair.d(X) = X [d <- #d * 2 + 1]
 
 dim d <- 42
 var A = 1 + 2 + #d

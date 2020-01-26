@@ -6,9 +6,9 @@ import Text.Parsec.String
 import Text.Parsec.Expr
 import Text.Parsec.Token
 import Text.Parsec.Language
-import TL
 import qualified Data.Array as Array
 import qualified Data.Map as Map
+import TL
 
 
 def = emptyDef{ commentStart = "{-"
@@ -29,7 +29,7 @@ def = emptyDef{ commentStart = "{-"
                                  "if", "then", "else",
                                  "true", "false",
                                  "where", "var", "fun", "dim", "end",
-                                 "lambda", "let", "in"]
+                                 "fn", "let", "in"]
               , caseSensitive = True
               }
 
@@ -44,7 +44,8 @@ TokenParser{ parens = m_parens
            , reservedOp = m_reservedOp
            , reserved = m_reserved
            , stringLiteral = m_stringLiteral
-           , whiteSpace = m_whiteSpace } = makeTokenParser def
+           , whiteSpace = m_whiteSpace
+           } = makeTokenParser def
 
 parserCtxPair :: Parser (String, TLexpr)
 parserCtxPair =
@@ -321,18 +322,18 @@ table = [ [ parserUnop  "!"  TLunNot
         , [ parserBinop "||" TLbinOr AssocLeft ]
         ]
 
-term = m_parens parserExprOps
+term =     parserExprParens
+       <|> parserExprParensPerturb
+       <|> parserExprId
+       <|> parserExprIdPerturb
        <|> m_brackets parserArray
        <|> do
              datum <- parserData
              return (TLconst datum)
        <|> do
              m_reservedOp "#"
-             x <- m_identifier
-             return (TLhash x)
-       <|> do
-             x <- m_identifier
-             return (TLvar x)
+             d <- m_identifier
+             return (TLhash d)
        <|> do
              m_reserved "if"
              arg1 <- parserExpr
@@ -342,19 +343,45 @@ term = m_parens parserExprOps
              arg3 <- parserExpr
              return (TLcond arg1 arg2 arg3)
        <|> do
-             m_reserved "let"
-             pairs <- parserCtx
-             m_reserved "in"
-             arg <- parserExpr
-             return (TLat pairs arg)
-       <|> do
-             m_reserved "lambda"
+             m_reserved "fn"
              m_reservedOp "."
              dimArgs <- parserIds
              varArgs <- m_parens parserIds
              m_reservedOp "->"
              arg <- parserExpr
-             return (TLlambda dimArgs varArgs arg)
+             return (TLfn dimArgs varArgs arg)
+
+parserExprParens :: Parser TLexpr
+parserExprParens =
+  try (do
+         arg <- m_parens parserExpr
+         notFollowedBy (char '[')
+         return arg
+      )
+
+parserExprParensPerturb :: Parser TLexpr
+parserExprParensPerturb =
+  try (do
+         arg <- m_parens parserExpr
+         pairs <- m_brackets parserCtx
+         return (TLat pairs arg)
+      )
+
+parserExprId :: Parser TLexpr
+parserExprId =
+  try (do
+         x <- m_identifier
+         notFollowedBy (char '[')
+         return (TLvar x)
+      )
+
+parserExprIdPerturb :: Parser TLexpr
+parserExprIdPerturb =
+  try (do
+         x <- m_identifier
+         pairs <- m_brackets parserCtx
+         return (TLat pairs (TLvar x))
+      )
 
 parserExprSimple :: Parser TLexpr
 parserExprSimple =
