@@ -143,7 +143,7 @@ parserExprApply =
          func <- parserExprOps
          notFollowedBy (m_reserved "where")
          m_reservedOp "."
-         dimActuals <- parserIds
+         dimActuals <- parserIdsDots
          exprActuals <- m_parens parserExprs
          return (TLapply func dimActuals exprActuals)
       )
@@ -163,6 +163,9 @@ parserExprWhere =
 
 parserIds :: Parser [String]
 parserIds = m_commaSep m_identifier
+
+parserIdsDots :: Parser [String]
+parserIdsDots = sepBy1 m_identifier m_dot
 
 parserExprs :: Parser [TLexpr]
 parserExprs = m_commaSep parserExpr
@@ -189,6 +192,11 @@ table = [ [ parserUnop  "!"  TLunNot
           ]
         , [ parserBinop "&&" TLbinAnd AssocLeft ]
         , [ parserBinop "||" TLbinOr AssocLeft ]
+        , [ parserTLop "fby"
+          , parserTLop "ybf"
+          , parserTLop "wvr"
+          , parserTLop "upon"
+          ]
         ]
 
 term =     parserExprParens
@@ -214,11 +222,21 @@ term =     parserExprParens
        <|> do
              m_reserved "fn"
              m_reservedOp "."
-             dimArgs <- parserIds
+             dimArgs <- parserIdsDots
              varArgs <- m_parens parserIds
              m_reservedOp "->"
              arg <- parserExpr
              return (TLfn dimArgs varArgs arg)
+
+parserTLopToken token =
+  do
+    m_reserved token
+    m_reservedOp "."
+    d <- m_identifier
+    return (\x y -> TLapply (TLvar token) [d] [x,y])
+
+parserTLop token =
+  Infix (parserTLopToken token) AssocLeft
 
 parserUnop opToken opTL =
   Prefix (m_reservedOp opToken >> return (\x -> TLunop opTL x))
@@ -327,6 +345,7 @@ TokenParser{ parens = m_parens
            , comma = m_comma
            , commaSep = m_commaSep
            , commaSep1 = m_commaSep1
+           , dot = m_dot
            , identifier = m_identifier
            , integer = m_integer
            , reservedOp = m_reservedOp

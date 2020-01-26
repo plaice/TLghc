@@ -8,5 +8,7 @@ fun rPair.d(X) = X [d <- #d * 2 + 1]
 
 dim d <- 42
 var A = 1 + 2 + #d
+var X = 0 fby.d X+1
 
 evalExpr next.d(A) @ []
+evalExpr X @ []
