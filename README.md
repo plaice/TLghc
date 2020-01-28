@@ -120,3 +120,37 @@ the manipulation of a multidimensional context. The syntactic elements are:
   * `expr where declarations end`, where `declarations` is a sequence of
     `dim` and `var` declarations, allows the declaration of identifiers
     local to expression `expr`.
+
+### Simple examples
+The file `simpleExamples` contains the following declarations:
+
+    var index.d = #d
+    var index2.d1.d2 = #d1 + #d2
+    var first.d(X) = X [d <- 0]
+    var next.d(X)  = X [d <- #d + 1]
+    var prev.d(X)  = X [d <- #d - 1]
+    var fby.d(X,Y) = if #d < 1 then X else Y [d <- #d - 1]
+    var ybf.d(X,Y) = if #d > -1 then Y else X [d <- #d + 1]
+    var lPair.d(X) = X [d <- #d * 2]
+    var rPair.d(X) = X [d <- #d * 2 + 1]
+
+    var asa.d(X,Y) = first.d (X wvr.d Y)
+    var wvr.d(X,Y) = X [d <- T]
+      where
+        var T = U fby.d U [d <- T+1]
+        var U = if Y then #d else next.d(U)
+      end
+    var upon.d(X,Y) = X [d <- W]
+      where
+        var W = 0 fby.d if Y then W+1 else W
+      end
+
+    dim d  <- 0
+    dim d0 <- 0
+    dim d1 <- 0
+    var X = 0 fby.d X+1
+    var Y = Y-1 ybf.d 0
+
+    evalExpr X @ [d <- -2 .. 2]
+    evalExpr Y @ [d <- -2 .. 2]
+    evalExpr index2.d0.d1 @ [d0 <- 1 .. 3, d1 <- 2 .. 4]
