@@ -26,25 +26,25 @@ These can be interleaved as the programmer wishes.
 
 The `dim` keyword declares a dimension identifier.
 * In the declaration
-  ```dim d <- expr```
+      dim d <- expr
   dimension `d` is declared, whose initial ordinate is set
   to be the result of evaluating expression `expr`.
 
 The `var` keyword declares a variable or function identifier.
 
 * In the declaration
-  ```var x = expr```
+      var x = expr
   variable `x` is declared to be equal to expression `expr`.
 * In the declaration
-  ```var x.d1...dm = expr```
+      var x.d1...dm = expr
   variable `x`, indexed by the _m_ dimension formal parameters
   `d1` through `dm`, is declared to be equal to expression `expr`.
 * In the declaration
-  ```var x(x1,...,xn) = expr```
+      var x(x1,...,xn) = expr
   function `x` is declared to take the _n_ formal parameters
   `x1` through `xn` and to have `expr` as body.
 * In the declaration
-  ```var x.d1...dm(x1,...,xn) = expr```
+      var x.d1...dm(x1,...,xn) = expr
   function `x`, indexed by the _m_ dimension parameters
   `d1` through `dm`, is declared to take the _n_ formal parameters
   `x1` through `xn` and to have `expr` as body.
