@@ -10,8 +10,12 @@ can be found at
 ### Installation
 The interpreter is a standalone **cabal** package, which can only be used
 if you have **ghc** and **cabal** installed.  If you do, then just
-**git clone** the repository, and then run `cabal v2-build`. It will
-build a binary called **tlghc**.
+**git clone** the repository, and then run
+
+    cabal v2-configure
+    cabal v2-build
+
+It will build a binary called **tlghc**.
 
 ### Usage
 The interface for **tlghc** is very simple:
