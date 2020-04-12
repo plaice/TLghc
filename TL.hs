@@ -8,11 +8,15 @@ module TL (
   TLexpr(TLconst, TLarray1, TLarray2, TLarray3, TLarray4, TLarray5,
          TLunop, TLbinop, TLcond, TLhash, TLat,
          TLvar, TLwhere, TLfn, TLapply),
-  TLdecl(TLdeclDim, TLdeclVar, TLdeclFunc),
+  TLdecl(TLdeclDim, TLdeclDimError,
+         TLdeclVar, TLdeclVarError,
+         TLdeclFunc),
   TLenvEntry(TLdim, TLenvExpr, TLenvBinding),
-  TLeval(TLevalExpr),
+  TLeval(TLevalExpr, TLevalExprError),
   TLfile(TLfile),
   isDeclDim,isDeclVar,isDeclFunc
+  ,isDeclDimError,isDeclVarError
+  ,isEvalExpr,isEvalExprError
   ,eval
   ,evalFile
 )
@@ -56,7 +60,9 @@ data TLduo = TLbinAnd
   deriving (Show)
 
 data TLdecl = TLdeclDim String TLexpr
+            | TLdeclDimError String
             | TLdeclVar String TLexpr
+            | TLdeclVarError String
             | TLdeclFunc String [String] [String] TLexpr
   deriving Show
 
@@ -97,12 +103,14 @@ data TLenvEntry = TLdim Integer
                 | TLenvBinding [String] TLexpr TLenv TLctx
 
 data TLeval = TLevalExpr TLexpr [(String,(Integer,Integer))]
+            | TLevalExprError String
   deriving (Show)
 
 type TLctx = Map.Map Integer TLdata
 type TLenv = Map.Map String TLenvEntry
 
 data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
+                     [TLdecl] [TLdecl] [TLeval]
   deriving (Show)
 
 expandRange [] = [[]]
@@ -135,7 +143,7 @@ removePrefix' pairs (pairs':l) = (removePrefixOne pairs pairs'):(removePrefix' p
 removePrefix [] = []
 removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
 
-evalFile (TLfile dims vars funcs evalExprs) =
+evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
   mapM_ (\(TLevalExpr expr ctxRange) ->
                    let expandedRanges = expandRange ctxRange in
                    let rangeTexts = removePrefix (map foldPairs expandedRanges) in
@@ -348,7 +356,7 @@ ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
 ctxLookupOrd loc ctx =
   case ord of
     Just v -> v
-    Nothing -> error $ "ctxLookupOrd did not find" ++ (show loc)
+    Nothing -> error $ "ctxLookupOrd did not find " ++ (show loc)
   where ord = Map.lookup loc ctx
 
 ctxLookup d env ctx =
@@ -409,5 +417,17 @@ isDeclVar _               = False
 
 isDeclFunc (TLdeclFunc _ _ _ _) = True
 isDeclFunc _                    = False
+
+isDeclDimError (TLdeclDimError _) = True
+isDeclDimError _                  = False
+
+isDeclVarError (TLdeclVarError _) = True
+isDeclVarError _                  = False
+
+isEvalExpr (TLevalExpr _ _) = True
+isEvalExpr _                = False
+
+isEvalExprError (TLevalExprError _) = True
+isEvalExprError _                   = False
 
 removeJust (Just (TLint i)) = i
