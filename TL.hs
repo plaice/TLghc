@@ -1,3 +1,5 @@
+{-# LANGUAGE ConstrainedClassMethods #-}
+
 module TL (
   TLctx, TLenv,
   TLdata(TLbool, TLchar, TLint, TLstr, TLfunc),
@@ -25,6 +27,7 @@ where
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Array as Array
+import Data.List
 
 data TLdata = TLbool Bool
             | TLchar Char
@@ -41,7 +44,7 @@ instance Show TLdata where
 
 data TLuno = TLunNot
            | TLunNegate
-  deriving (Show)
+  deriving Show
 
 data TLduo = TLbinAnd
            | TLbinOr
@@ -57,13 +60,6 @@ data TLduo = TLbinAnd
            | TLbinGT
            | TLbinEQ
            | TLbinNE
-  deriving (Show)
-
-data TLdecl = TLdeclDim String TLexpr
-            | TLdeclDimError String
-            | TLdeclVar String TLexpr
-            | TLdeclVarError String
-            | TLdeclFunc String [String] [String] TLexpr
   deriving Show
 
 data TLexpr = TLconst TLdata
@@ -96,22 +92,141 @@ data TLexpr = TLconst TLdata
             | TLwhere [TLdecl] [TLdecl] [TLdecl] TLexpr
             | TLfn [String] [String] TLexpr
             | TLapply TLexpr [String] [TLexpr]
-  deriving (Show)
+  deriving Show
+
+showN 0 = ""
+showN n = " " ++ showN (n-1)
+
+instance Show' TLexpr where
+  show' a@(TLconst _) n = show a
+  show' a@(TLarray1 _ _) n = show a
+  show' a@(TLarray2 _ _) n = show a
+  show' a@(TLarray3 _ _) n = show a
+  show' a@(TLarray4 _ _) n = show a
+  show' a@(TLarray5 _ _) n = show a
+  show' (TLunop unop arg) n =
+    "TLunop " ++ show unop ++
+    "\n" ++ showN (n+2) ++
+    show' arg (n+2)
+  show' (TLbinop binop lhs rhs) n =
+    "TLbinop " ++ show binop ++
+    "\n" ++ showN (n+2) ++
+    show' lhs (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' rhs (n+2)
+  show' (TLcond ifExpr thenExpr elseExpr) n =
+    "TLcond" ++
+    "\n" ++ showN (n+2) ++
+    show' ifExpr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' thenExpr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' elseExpr (n+2)
+  show' a@(TLhash _) n = show a
+  show' (TLat pairs expr) n =
+    "TLat\n" ++
+    (concat $
+     map (\(dim,exp) ->
+          showN (n+2) ++ show dim ++ "\n" ++
+          showN (n+2) ++ show' exp (n+2) ++ "\n") pairs) ++
+    showN (n+2) ++
+    show' expr (n+2)
+  show' a@(TLvar _) n = show a
+  show' (TLwhere dims vars funcs expr) n =
+    "TLwhere\n" ++
+    (concat $
+     (filter (\l -> not (null l))
+      [concat $ (map (\act -> show' act (n+2)) dims),
+       concat $ (map (\act -> show' act (n+2)) vars),
+       concat $ (map (\act -> show' act (n+2)) funcs)])) ++
+    showN (n+2) ++
+    show' expr (n+2)
+  show' (TLfn dimArgs varArgs expr) n =
+    "TLfn" ++
+    "\n" ++ showN (n+2) ++
+    show dimArgs ++
+    "\n" ++ showN (n+2) ++
+    show varArgs ++
+    "\n" ++ showN (n+2) ++
+     show' expr (n+2)
+  show' (TLapply fnActual dimActuals exprActuals) n =
+    "TLapply " ++ show fnActual ++ "\n" ++
+    (concat $ intersperse "\n"
+     (filter (\l -> not (null l))
+      [concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show act) dimActuals),
+       concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show' act (n+2)) exprActuals)]))
+
 
 data TLenvEntry = TLdim Integer
                 | TLenvExpr TLexpr
                 | TLenvBinding [String] TLexpr TLenv TLctx
 
+class Show' a where
+  show' :: (Show a) => a -> Int -> String
+  show' arg n = show arg
+
 data TLeval = TLevalExpr TLexpr [(String,(Integer,Integer))]
             | TLevalExprError String
-  deriving (Show)
+  deriving Show
+
+instance Show' TLeval where
+  show' (TLevalExpr expr ranges) n =
+    showN n ++
+    "TLevalExpr " ++ show' expr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show ranges ++ "\n"
+  show' (TLevalExprError err) n =
+    showN n ++
+    "TLevalExprError " ++ show err ++ "\n"
 
 type TLctx = Map.Map Integer TLdata
 type TLenv = Map.Map String TLenvEntry
 
+data TLdecl = TLdeclDim String TLexpr
+            | TLdeclDimError String
+            | TLdeclVar String TLexpr
+            | TLdeclVarError String
+            | TLdeclFunc String [String] [String] TLexpr
+  deriving Show
+
+instance Show' TLdecl where
+  show' (TLdeclDim name expr) n =
+    showN n ++
+    "TLdeclDim " ++ show name ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+  show' (TLdeclDimError err) n =
+    showN n ++
+    "TLdeclDimError " ++ show err ++ "\n"
+  show' (TLdeclVar name expr) n =
+    showN n ++
+    "TLdeclVar " ++ show name ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+  show' (TLdeclVarError err) n =
+    showN n ++
+    "TLdeclVarError " ++ show err ++ "\n"
+  show' (TLdeclFunc name dimArgs varArgs expr) n =
+    showN n ++
+    "TLdeclFunc " ++ show name ++
+    " " ++ show dimArgs ++
+    " " ++ show varArgs ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+
 data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
                      [TLdecl] [TLdecl] [TLeval]
-  deriving (Show)
+
+instance Show TLfile where
+  show (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
+    "TLfile\n" ++
+    (concat $ map (\dim -> show' dim 2) dims) ++
+    (concat $ map (\var -> show' var 2) vars) ++
+    (concat $ map (\func -> show' func 2) funcs) ++
+    (concat $ map (\evalExpr -> show' evalExpr 2) evalExprs) ++
+    (concat $ map (\err1 -> show' err1 2) errs1) ++
+    (concat $ map (\err2 -> show' err2 2) errs2) ++
+    (concat $ map (\err3 -> show' err3 2) errs3)
 
 expandRange [] = [[]]
 expandRange ((d,(min,max)):ranges) =
