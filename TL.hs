@@ -159,7 +159,7 @@ instance Show' TLexpr where
 
 data TLenvEntry = TLdim Integer
                 | TLenvExpr TLexpr
-                | TLenvBinding [String] TLexpr TLenv TLctx
+                | TLenvBinding [(String,String)] TLexpr TLenv TLctx
   deriving Show
 
 class Show' a where
@@ -261,22 +261,22 @@ removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
 
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
   mapM_ (\(TLevalExpr expr ctxRange) ->
-                   let expandedRanges = expandRange ctxRange in
-                   let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-                   let externDims = Map.fromList $ getDims ctxRange in
-                   let (env,ctx) = ctxFromAPI externDims 0 in
-                   do
-                     putStrLn . show $ expr
-                     mapM_ (\(text,pairs) ->
-                            do putStr "  "
-                               putStr $ id text
-                               putStr ": "
-                               putStrLn . show $
-                                 eval (TLwhere dims vars funcs (TLat pairs expr))
-                                      (Map.fromList []) (Map.fromList [])
-                           )
-                            (zip rangeTexts expandedRanges))
-              evalExprs
+         let expandedRanges = expandRange ctxRange in
+         let rangeTexts = removePrefix (map foldPairs expandedRanges) in
+         let externDims = Map.fromList $ getDims ctxRange in
+         let (env,ctx) = ctxFromAPI externDims 0 in
+         do
+           putStrLn . show $ expr
+           mapM_ (\(text,pairs) ->
+                  do putStr "  "
+                     putStr $ id text
+                     putStr ": "
+                     putStrLn . show $
+                       eval (TLwhere dims vars funcs (TLat pairs expr))
+                            (Map.fromList []) (Map.fromList [])
+                 )
+                 (zip rangeTexts expandedRanges))
+        evalExprs
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
@@ -287,16 +287,6 @@ eval (TLat args arg) env ctx =
     evalPair [] env ctx = []
     evalPair ((d,expr):args) env ctx =
       (d, eval expr env ctx):(evalPair args env ctx)
-
-eval (TLvar x) env ctx =
-  case envEntry of
-    TLdim loc -> error $ "TLvar: Dimension used as variable: " ++ x
-    TLenvExpr expr -> eval expr env ctx
-    TLenvBinding dims expr envBind ctxBind ->
-      eval expr envBind
-           (ctxPerturb (map (\d -> (d, eval (TLhash d) env ctx)) dims)
-                       env ctxBind)
-  where envEntry = envLookup x env
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
   eval expr
@@ -315,6 +305,16 @@ eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
                  (map (\(TLdeclDim d expr,rk) -> (rk, eval expr env ctx))
                       triples)
 
+eval (TLvar x) env ctx =
+  case envEntry of
+    TLdim loc -> error $ "TLvar: Dimension used as variable: " ++ x
+    TLenvExpr expr -> eval expr env ctx
+    TLenvBinding dimPairs expr envBind ctxBind ->
+      eval expr envBind
+           (ctxPerturb (map (\(d,d') -> (d', eval (TLhash d) env ctx)) dimPairs)
+                       envBind ctxBind)
+  where envEntry = envLookup x env
+
 eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
     TLfunc funcLambda -> funcLambda dimActuals exprActuals env ctx
@@ -326,22 +326,20 @@ eval (TLfn dimArgs varArgs expr) env ctx =
   (\dimActuals -> \exprActuals -> \envActuals -> \ctxActuals ->
    let
      maxRank = max (ctxRank ctx) (ctxRank ctxActuals)
-     triples = zip (zip dimArgs dimActuals) [1 + maxRank ..]
-     pairs = zip varArgs exprActuals
+     dimPairs = zip dimArgs dimActuals
+     dimTriples = zip dimPairs [1 + maxRank ..]
+     varPairs = zip varArgs exprActuals
      ctxDims = Map.fromList
                  (map (\((d,d'),rk) ->
-                      (rk, ctxLookup d' envActuals ctxActuals)) triples)
+                      (rk, ctxLookup d' envActuals ctxActuals)) dimTriples)
      ctx' = Map.union ctxDims ctx
-     envActualsDims = Map.fromList
-                        (map (\((d,d'),rk) -> (d', TLdim rk)) triples)
-     envActuals' = (Map.union envActualsDims envActuals)
      envDims = Map.fromList
-                 (map (\((d,d'),rk) -> (d, TLdim rk)) triples)
+                 (map (\((d,d'),rk) -> (d, TLdim rk)) dimTriples)
      envBindings = Map.fromList
                      (map (\(x,expr) ->
-                           (x, TLenvBinding dimArgs expr
-                               envActuals' ctxActuals))
-                          pairs)
+                           (x, TLenvBinding dimPairs expr
+                               envActuals ctxActuals))
+                          varPairs)
      env' = (Map.union (Map.union envDims envBindings) env)
    in eval expr env' ctx')
 
