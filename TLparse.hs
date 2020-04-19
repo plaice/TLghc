@@ -13,8 +13,10 @@ import System.IO
 
 playFile inp = case parse parserFile "" inp of
                  Left err -> error "playFile: parse failed"
-                 --Right ans -> evalFile ans
-                 Right ans -> putStr . show $ ans
+                 Right ans -> do
+                                putStr . show $ ans
+                                putStrLn "========"
+                                evalFile ans
 
 parserFile :: Parser TLfile
 parserFile =

@@ -160,6 +160,7 @@ instance Show' TLexpr where
 data TLenvEntry = TLdim Integer
                 | TLenvExpr TLexpr
                 | TLenvBinding [String] TLexpr TLenv TLctx
+  deriving Show
 
 class Show' a where
   show' :: (Show a) => a -> Int -> String
@@ -271,7 +272,9 @@ evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
                                putStr $ id text
                                putStr ": "
                                putStrLn . show $
-                                 eval (TLwhere dims vars funcs (TLat pairs expr)) env ctx)
+                                 eval (TLwhere dims vars funcs (TLat pairs expr))
+                                      (Map.fromList []) (Map.fromList [])
+                           )
                             (zip rangeTexts expandedRanges))
               evalExprs
 
@@ -287,12 +290,12 @@ eval (TLat args arg) env ctx =
 
 eval (TLvar x) env ctx =
   case envEntry of
-    TLdim loc -> error $ "Dimension used as variable: " ++ x
+    TLdim loc -> error $ "TLvar: Dimension used as variable: " ++ x
     TLenvExpr expr -> eval expr env ctx
     TLenvBinding dims expr envBind ctxBind ->
       eval expr envBind
            (ctxPerturb (map (\d -> (d, eval (TLhash d) env ctx)) dims)
-                       envBind ctxBind)
+                       env ctxBind)
   where envEntry = envLookup x env
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
@@ -315,7 +318,7 @@ eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
 eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
     TLfunc funcLambda -> funcLambda dimActuals exprActuals env ctx
-    _                 -> error "Type error"
+    _                 -> error "TLapply: Type error"
   where funcEval = (eval func env ctx)
 
 eval (TLfn dimArgs varArgs expr) env ctx =
@@ -388,19 +391,19 @@ eval (TLcond arg1 arg2 arg3) env ctx =
   case val1 of
     TLbool True  -> eval arg2 env ctx
     TLbool False -> eval arg3 env ctx
-    _            -> error "Type error"
+    _            -> error "TLcond: Type error"
   where val1 = eval arg1 env ctx
 
 eval (TLunop TLunNot arg) env ctx =
   case val of
     TLbool b -> TLbool (not b)
-    _        -> error "Type error"
+    _        -> error "TLunop: Type error"
   where val = eval arg env ctx
 
 eval (TLunop TLunNegate arg) env ctx =
   case val of
     TLint i -> TLint (negate i)
-    _       -> error "Type error"
+    _       -> error "TLunop: Type error"
   where val = eval arg env ctx
 
 eval (TLbinop TLbinAnd   arg1 arg2) env ctx =
@@ -436,7 +439,7 @@ eval (TLbinop TLbinEQ    arg1 arg2) env ctx =
     (TLchar c1, TLchar c2) -> TLbool (c1 == c2)
     (TLint i1, TLint i2)   -> TLbool (i1 == i2)
     (TLstr s1, TLstr s2)   -> TLbool (s1 == s2)
-    _                    -> error "Type error"
+    _                    -> error "TLbinop: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 eval (TLbinop TLbinNE    arg1 arg2) env ctx =
@@ -445,25 +448,25 @@ eval (TLbinop TLbinNE    arg1 arg2) env ctx =
     (TLchar c1, TLchar c2) -> TLbool (c1 /= c2)
     (TLint i1, TLint i2)   -> TLbool (i1 /= i2)
     (TLstr s1, TLstr s2)   -> TLbool (s1 /= s2)
-    _                    -> error "Type error"
+    _                    -> error "TLbinop: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopBool op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLbool b1, TLbool b2) -> TLbool (op b1 b2)
-    _                      -> error "Type error"
+    _                      -> error "evalBinopBool: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopInt op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLint (op i1 i2)
-    _                    -> error "Type error"
+    _                    -> error "evalBinopInt: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopRel op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLbool (op i1 i2)
-    _                    -> error "Type error"
+    _                    -> error "evalBinopRel: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
@@ -471,20 +474,20 @@ ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
 ctxLookupOrd loc ctx =
   case ord of
     Just v -> v
-    Nothing -> error $ "ctxLookupOrd did not find " ++ (show loc)
+    Nothing -> error $ "ctxLookupOrd: Did not find " ++ (show loc)
   where ord = Map.lookup loc ctx
 
 ctxLookup d env ctx =
   case dim of
     Just (TLdim loc) -> ctxLookupOrd loc ctx
-    Nothing -> error $ "ctxLookup did not find " ++ d
+    Nothing -> error $ "ctxLookup: Did not find " ++ d
     _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
   where dim = Map.lookup d env
 
 ctxPerturbOne d v env ctx =
   case dim of
     Just (TLdim loc) -> Map.insert loc v ctx
-    Nothing -> error $ "ctxPerturbOne did not find " ++ d
+    Nothing -> error $ "ctxPerturbOne: Did not find " ++ d
   where dim = Map.lookup d env
 
 ctxPerturb [] env ctx = ctx
@@ -500,7 +503,7 @@ ctxToAPI' set0 env ctx =
                       Just (TLdim i) ->
                         case ord of
                           Just j -> (Set.insert key set, Map.insert key j m)
-                          Nothing -> error ("lookAtOne could not find " ++
+                          Nothing -> error ("lookAtOne: Did not find " ++
                                             (show i))
                         where ord = Map.lookup i ctx
                       _ -> (set, m)
@@ -521,7 +524,7 @@ ctxFromAPI ctx n = (env', ctx')
 envLookup x env =
   case expr of
     Just e -> e
-    Nothing -> error $ "envLookup did not find " ++ x
+    Nothing -> error $ "envLookup: Did not find " ++ x
   where expr = Map.lookup x env
 
 isDeclDim (TLdeclDim _ _) = True
