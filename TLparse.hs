@@ -462,20 +462,17 @@ def = emptyDef{ commentStart = "{-"
               , identStart = letter <|> char '_'
               , identLetter = alphaNum
               , opStart = opLetter emptyDef
-              , opLetter = oneOf "!*/%+=<>=/#@."
+              , opLetter = oneOf "!*/%+=<>=/."
               , reservedOpNames = [ "+", "-"
                                   , "*", "%", "%%", "/"
                                   , "<", ">", "<=", ">=", "==", "/="
                                   , "&&", "||"
-                                  , "#", "@"
                                   , "<-", ".", "->"
                                   ]
-              , reservedNames = ["negate", "div", "mod", "rem",
-                                 "not", "and", "or",
-                                 "if", "then", "else",
+              , reservedNames = ["if", "then", "else",
                                  "true", "false",
                                  "where", "var", "fun", "dim", "end",
-                                 "fn", "let", "in"]
+                                 "fn"]
               , caseSensitive = True
               }
 
