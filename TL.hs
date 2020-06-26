@@ -1,3 +1,5 @@
+{-# LANGUAGE ConstrainedClassMethods #-}
+
 module TL (
   TLctx, TLenv,
   TLdata(TLbool, TLchar, TLint, TLstr, TLfunc),
@@ -8,11 +10,15 @@ module TL (
   TLexpr(TLconst, TLarray1, TLarray2, TLarray3, TLarray4, TLarray5,
          TLunop, TLbinop, TLcond, TLhash, TLat,
          TLvar, TLwhere, TLfn, TLapply),
-  TLdecl(TLdeclDim, TLdeclVar, TLdeclFunc),
+  TLdecl(TLdeclDim, TLdeclDimError,
+         TLdeclVar, TLdeclVarError,
+         TLdeclFunc),
   TLenvEntry(TLdim, TLenvExpr, TLenvBinding),
-  TLeval(TLevalExpr),
+  TLeval(TLevalExpr, TLevalExprError),
   TLfile(TLfile),
   isDeclDim,isDeclVar,isDeclFunc
+  ,isDeclDimError,isDeclVarError
+  ,isEvalExpr,isEvalExprError
   ,eval
   ,evalFile
 )
@@ -21,6 +27,7 @@ where
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Array as Array
+import Data.List
 
 data TLdata = TLbool Bool
             | TLchar Char
@@ -37,7 +44,7 @@ instance Show TLdata where
 
 data TLuno = TLunNot
            | TLunNegate
-  deriving (Show)
+  deriving Show
 
 data TLduo = TLbinAnd
            | TLbinOr
@@ -53,11 +60,6 @@ data TLduo = TLbinAnd
            | TLbinGT
            | TLbinEQ
            | TLbinNE
-  deriving (Show)
-
-data TLdecl = TLdeclDim String TLexpr
-            | TLdeclVar String TLexpr
-            | TLdeclFunc String [String] [String] TLexpr
   deriving Show
 
 data TLexpr = TLconst TLdata
@@ -90,20 +92,142 @@ data TLexpr = TLconst TLdata
             | TLwhere [TLdecl] [TLdecl] [TLdecl] TLexpr
             | TLfn [String] [String] TLexpr
             | TLapply TLexpr [String] [TLexpr]
-  deriving (Show)
+  deriving Show
+
+showN 0 = ""
+showN n = " " ++ showN (n-1)
+
+instance Show' TLexpr where
+  show' a@(TLconst _) n = show a
+  show' a@(TLarray1 _ _) n = show a
+  show' a@(TLarray2 _ _) n = show a
+  show' a@(TLarray3 _ _) n = show a
+  show' a@(TLarray4 _ _) n = show a
+  show' a@(TLarray5 _ _) n = show a
+  show' (TLunop unop arg) n =
+    "TLunop " ++ show unop ++
+    "\n" ++ showN (n+2) ++
+    show' arg (n+2)
+  show' (TLbinop binop lhs rhs) n =
+    "TLbinop " ++ show binop ++
+    "\n" ++ showN (n+2) ++
+    show' lhs (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' rhs (n+2)
+  show' (TLcond ifExpr thenExpr elseExpr) n =
+    "TLcond" ++
+    "\n" ++ showN (n+2) ++
+    show' ifExpr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' thenExpr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show' elseExpr (n+2)
+  show' a@(TLhash _) n = show a
+  show' (TLat pairs expr) n =
+    "TLat\n" ++
+    (concat $
+     map (\(dim,exp) ->
+          showN (n+2) ++ show dim ++ "\n" ++
+          showN (n+2) ++ show' exp (n+2) ++ "\n") pairs) ++
+    showN (n+2) ++
+    show' expr (n+2)
+  show' a@(TLvar _) n = show a
+  show' (TLwhere dims vars funcs expr) n =
+    "TLwhere\n" ++
+    (concat $
+     (filter (\l -> not (null l))
+      [concat $ (map (\act -> show' act (n+2)) dims),
+       concat $ (map (\act -> show' act (n+2)) vars),
+       concat $ (map (\act -> show' act (n+2)) funcs)])) ++
+    showN (n+2) ++
+    show' expr (n+2)
+  show' (TLfn dimArgs varArgs expr) n =
+    "TLfn" ++
+    "\n" ++ showN (n+2) ++
+    show dimArgs ++
+    "\n" ++ showN (n+2) ++
+    show varArgs ++
+    "\n" ++ showN (n+2) ++
+     show' expr (n+2)
+  show' (TLapply fnActual dimActuals exprActuals) n =
+    "TLapply " ++ show fnActual ++ "\n" ++
+    (concat $ intersperse "\n"
+     (filter (\l -> not (null l))
+      [concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show act) dimActuals),
+       concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show' act (n+2)) exprActuals)]))
+
 
 data TLenvEntry = TLdim Integer
                 | TLenvExpr TLexpr
-                | TLenvBinding [String] TLexpr TLenv TLctx
+                | TLenvBinding [(String,String)] TLexpr TLenv TLctx
+  deriving Show
+
+class Show' a where
+  show' :: (Show a) => a -> Int -> String
+  show' arg n = show arg
 
 data TLeval = TLevalExpr TLexpr [(String,(Integer,Integer))]
-  deriving (Show)
+            | TLevalExprError String
+  deriving Show
+
+instance Show' TLeval where
+  show' (TLevalExpr expr ranges) n =
+    showN n ++
+    "TLevalExpr " ++ show' expr (n+2) ++
+    "\n" ++ showN (n+2) ++
+    show ranges ++ "\n"
+  show' (TLevalExprError err) n =
+    showN n ++
+    "TLevalExprError " ++ show err ++ "\n"
 
 type TLctx = Map.Map Integer TLdata
 type TLenv = Map.Map String TLenvEntry
 
+data TLdecl = TLdeclDim String TLexpr
+            | TLdeclDimError String
+            | TLdeclVar String TLexpr
+            | TLdeclVarError String
+            | TLdeclFunc String [String] [String] TLexpr
+  deriving Show
+
+instance Show' TLdecl where
+  show' (TLdeclDim name expr) n =
+    showN n ++
+    "TLdeclDim " ++ show name ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+  show' (TLdeclDimError err) n =
+    showN n ++
+    "TLdeclDimError " ++ show err ++ "\n"
+  show' (TLdeclVar name expr) n =
+    showN n ++
+    "TLdeclVar " ++ show name ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+  show' (TLdeclVarError err) n =
+    showN n ++
+    "TLdeclVarError " ++ show err ++ "\n"
+  show' (TLdeclFunc name dimArgs varArgs expr) n =
+    showN n ++
+    "TLdeclFunc " ++ show name ++
+    " " ++ show dimArgs ++
+    " " ++ show varArgs ++
+    "\n" ++ showN (n+2) ++
+    show' expr (n+2) ++ "\n"
+
 data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
-  deriving (Show)
+                     [TLdecl] [TLdecl] [TLeval]
+
+instance Show TLfile where
+  show (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
+    "TLfile\n" ++
+    (concat $ map (\dim -> show' dim 2) dims) ++
+    (concat $ map (\var -> show' var 2) vars) ++
+    (concat $ map (\func -> show' func 2) funcs) ++
+    (concat $ map (\evalExpr -> show' evalExpr 2) evalExprs) ++
+    (concat $ map (\err1 -> show' err1 2) errs1) ++
+    (concat $ map (\err2 -> show' err2 2) errs2) ++
+    (concat $ map (\err3 -> show' err3 2) errs3)
 
 expandRange [] = [[]]
 expandRange ((d,(min,max)):ranges) =
@@ -135,22 +259,24 @@ removePrefix' pairs (pairs':l) = (removePrefixOne pairs pairs'):(removePrefix' p
 removePrefix [] = []
 removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
 
-evalFile (TLfile dims vars funcs evalExprs) =
+evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
   mapM_ (\(TLevalExpr expr ctxRange) ->
-                   let expandedRanges = expandRange ctxRange in
-                   let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-                   let externDims = Map.fromList $ getDims ctxRange in
-                   let (env,ctx) = ctxFromAPI externDims 0 in
-                   do
-                     putStrLn . show $ expr
-                     mapM_ (\(text,pairs) ->
-                            do putStr "  "
-                               putStr $ id text
-                               putStr ": "
-                               putStrLn . show $
-                                 eval (TLwhere dims vars funcs (TLat pairs expr)) env ctx)
-                            (zip rangeTexts expandedRanges))
-              evalExprs
+         let expandedRanges = expandRange ctxRange in
+         let rangeTexts = removePrefix (map foldPairs expandedRanges) in
+         let externDims = Map.fromList $ getDims ctxRange in
+         let (env,ctx) = ctxFromAPI externDims 0 in
+         do
+           putStrLn . show $ expr
+           mapM_ (\(text,pairs) ->
+                  do putStr "  "
+                     putStr $ id text
+                     putStr ": "
+                     putStrLn . show $
+                       eval (TLwhere dims vars funcs (TLat pairs expr))
+                            (Map.fromList []) (Map.fromList [])
+                 )
+                 (zip rangeTexts expandedRanges))
+        evalExprs
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
@@ -161,16 +287,6 @@ eval (TLat args arg) env ctx =
     evalPair [] env ctx = []
     evalPair ((d,expr):args) env ctx =
       (d, eval expr env ctx):(evalPair args env ctx)
-
-eval (TLvar x) env ctx =
-  case envEntry of
-    TLdim loc -> error $ "Dimension used as variable: " ++ x
-    TLenvExpr expr -> eval expr env ctx
-    TLenvBinding dims expr envBind ctxBind ->
-      eval expr envBind
-           (ctxPerturb (map (\d -> (d, eval (TLhash d) env ctx)) dims)
-                       envBind ctxBind)
-  where envEntry = envLookup x env
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
   eval expr
@@ -189,10 +305,20 @@ eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
                  (map (\(TLdeclDim d expr,rk) -> (rk, eval expr env ctx))
                       triples)
 
+eval (TLvar x) env ctx =
+  case envEntry of
+    TLdim loc -> error $ "TLvar: Dimension used as variable: " ++ x
+    TLenvExpr expr -> eval expr env ctx
+    TLenvBinding dimPairs expr envBind ctxBind ->
+      eval expr envBind
+           (ctxPerturb (map (\(d,d') -> (d', eval (TLhash d) env ctx)) dimPairs)
+                       envBind ctxBind)
+  where envEntry = envLookup x env
+
 eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
     TLfunc funcLambda -> funcLambda dimActuals exprActuals env ctx
-    _                 -> error "Type error"
+    _                 -> error "TLapply: Type error"
   where funcEval = (eval func env ctx)
 
 eval (TLfn dimArgs varArgs expr) env ctx =
@@ -200,22 +326,20 @@ eval (TLfn dimArgs varArgs expr) env ctx =
   (\dimActuals -> \exprActuals -> \envActuals -> \ctxActuals ->
    let
      maxRank = max (ctxRank ctx) (ctxRank ctxActuals)
-     triples = zip (zip dimArgs dimActuals) [1 + maxRank ..]
-     pairs = zip varArgs exprActuals
+     dimPairs = zip dimArgs dimActuals
+     dimTriples = zip dimPairs [1 + maxRank ..]
+     varPairs = zip varArgs exprActuals
      ctxDims = Map.fromList
                  (map (\((d,d'),rk) ->
-                      (rk, ctxLookup d' envActuals ctxActuals)) triples)
+                      (rk, ctxLookup d' envActuals ctxActuals)) dimTriples)
      ctx' = Map.union ctxDims ctx
-     envActualsDims = Map.fromList
-                        (map (\((d,d'),rk) -> (d', TLdim rk)) triples)
-     envActuals' = (Map.union envActualsDims envActuals)
      envDims = Map.fromList
-                 (map (\((d,d'),rk) -> (d, TLdim rk)) triples)
+                 (map (\((d,d'),rk) -> (d, TLdim rk)) dimTriples)
      envBindings = Map.fromList
                      (map (\(x,expr) ->
-                           (x, TLenvBinding dimArgs expr
-                               envActuals' ctxActuals))
-                          pairs)
+                           (x, TLenvBinding dimPairs expr
+                               envActuals ctxActuals))
+                          varPairs)
      env' = (Map.union (Map.union envDims envBindings) env)
    in eval expr env' ctx')
 
@@ -265,19 +389,19 @@ eval (TLcond arg1 arg2 arg3) env ctx =
   case val1 of
     TLbool True  -> eval arg2 env ctx
     TLbool False -> eval arg3 env ctx
-    _            -> error "Type error"
+    _            -> error "TLcond: Type error"
   where val1 = eval arg1 env ctx
 
 eval (TLunop TLunNot arg) env ctx =
   case val of
     TLbool b -> TLbool (not b)
-    _        -> error "Type error"
+    _        -> error "TLunop: Type error"
   where val = eval arg env ctx
 
 eval (TLunop TLunNegate arg) env ctx =
   case val of
     TLint i -> TLint (negate i)
-    _       -> error "Type error"
+    _       -> error "TLunop: Type error"
   where val = eval arg env ctx
 
 eval (TLbinop TLbinAnd   arg1 arg2) env ctx =
@@ -313,7 +437,7 @@ eval (TLbinop TLbinEQ    arg1 arg2) env ctx =
     (TLchar c1, TLchar c2) -> TLbool (c1 == c2)
     (TLint i1, TLint i2)   -> TLbool (i1 == i2)
     (TLstr s1, TLstr s2)   -> TLbool (s1 == s2)
-    _                    -> error "Type error"
+    _                    -> error "TLbinop: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 eval (TLbinop TLbinNE    arg1 arg2) env ctx =
@@ -322,25 +446,25 @@ eval (TLbinop TLbinNE    arg1 arg2) env ctx =
     (TLchar c1, TLchar c2) -> TLbool (c1 /= c2)
     (TLint i1, TLint i2)   -> TLbool (i1 /= i2)
     (TLstr s1, TLstr s2)   -> TLbool (s1 /= s2)
-    _                    -> error "Type error"
+    _                    -> error "TLbinop: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopBool op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLbool b1, TLbool b2) -> TLbool (op b1 b2)
-    _                      -> error "Type error"
+    _                      -> error "evalBinopBool: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopInt op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLint (op i1 i2)
-    _                    -> error "Type error"
+    _                    -> error "evalBinopInt: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 evalBinopRel op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLbool (op i1 i2)
-    _                    -> error "Type error"
+    _                    -> error "evalBinopRel: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
 ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
@@ -348,20 +472,20 @@ ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
 ctxLookupOrd loc ctx =
   case ord of
     Just v -> v
-    Nothing -> error $ "ctxLookupOrd did not find" ++ (show loc)
+    Nothing -> error $ "ctxLookupOrd: Did not find " ++ (show loc)
   where ord = Map.lookup loc ctx
 
 ctxLookup d env ctx =
   case dim of
     Just (TLdim loc) -> ctxLookupOrd loc ctx
-    Nothing -> error $ "ctxLookup did not find " ++ d
+    Nothing -> error $ "ctxLookup: Did not find " ++ d
     _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
   where dim = Map.lookup d env
 
 ctxPerturbOne d v env ctx =
   case dim of
     Just (TLdim loc) -> Map.insert loc v ctx
-    Nothing -> error $ "ctxPerturbOne did not find " ++ d
+    Nothing -> error $ "ctxPerturbOne: Did not find " ++ d
   where dim = Map.lookup d env
 
 ctxPerturb [] env ctx = ctx
@@ -377,7 +501,7 @@ ctxToAPI' set0 env ctx =
                       Just (TLdim i) ->
                         case ord of
                           Just j -> (Set.insert key set, Map.insert key j m)
-                          Nothing -> error ("lookAtOne could not find " ++
+                          Nothing -> error ("lookAtOne: Did not find " ++
                                             (show i))
                         where ord = Map.lookup i ctx
                       _ -> (set, m)
@@ -398,7 +522,7 @@ ctxFromAPI ctx n = (env', ctx')
 envLookup x env =
   case expr of
     Just e -> e
-    Nothing -> error $ "envLookup did not find " ++ x
+    Nothing -> error $ "envLookup: Did not find " ++ x
   where expr = Map.lookup x env
 
 isDeclDim (TLdeclDim _ _) = True
@@ -409,5 +533,17 @@ isDeclVar _               = False
 
 isDeclFunc (TLdeclFunc _ _ _ _) = True
 isDeclFunc _                    = False
+
+isDeclDimError (TLdeclDimError _) = True
+isDeclDimError _                  = False
+
+isDeclVarError (TLdeclVarError _) = True
+isDeclVarError _                  = False
+
+isEvalExpr (TLevalExpr _ _) = True
+isEvalExpr _                = False
+
+isEvalExprError (TLevalExprError _) = True
+isEvalExprError _                   = False
 
 removeJust (Just (TLint i)) = i

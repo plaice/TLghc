@@ -2,7 +2,7 @@
 --  see http://haskell.org/cabal/users-guide/
 
 name:                TLghc
-version:             0.0.3
+version:             0.0.3.0
 synopsis:            TransLucid interpreter written in Haskell
 -- description:
 homepage:            http://cartesianprogramming.com
