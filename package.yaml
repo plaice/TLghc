@@ -1,0 +1,53 @@
+name:                TLghc
+version:             0.1.0.0
+github:              "plaice/TLghc"
+license:             GPL-3
+author:              "John Plaice"
+maintainer:          "johnplaice@gmail.com"
+copyright:           "2020 John Plaice"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/test-htf#readme>
+
+dependencies:
+- base
+- containers
+- array
+- parsec
+- hspec
+- QuickCheck
+
+library:
+  source-dirs: src
+
+executables:
+  TLghc-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - TLghc
+
+tests:
+  TLghc-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - TLghc
