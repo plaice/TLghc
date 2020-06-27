@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.1.0.0 - 2020-06-27
+
+* Move to stack. Rewriting of the parser and execution engine.
+
 ## 0.0.3 -- 2020-01-27
 
 * Refactoring of the code. Introduction of demands for context ranges.

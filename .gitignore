@@ -1,4 +1,2 @@
-dist-newstyle
-cabal.project.local
-.ghc.environment.x86_64-linux-8.6.5
+.stack-work
 
