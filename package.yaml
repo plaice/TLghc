@@ -20,12 +20,12 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/test-htf#readme>
 
 dependencies:
-- base >= 4.12 && < 5
-- containers >= 0.6 && < 1
-- array >= 0.5 && < 1
-- parsec >= 3.1 && < 4
-- hspec >= 2.7 && < 3
-- QuickCheck >= 2.13 && < 3
+- base
+- containers
+- array
+- parsec
+- hspec
+- QuickCheck
 
 library:
   source-dirs: src
