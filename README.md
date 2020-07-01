@@ -8,8 +8,10 @@ can be found at
 [TransLucid and Cartesian Programming](cartesianprogramming.com).
 
 ### Installation
-The interpreter is a standalone **stack** package, which can only be used
-if you have **stack** installed.
+The interpreter is a standalone Haskell **stack** package, which can only be
+used if you have **stack** installed. If you do not have **stack**, follow
+the instructions at 
+[Stack User Manual](https://docs.haskellstack.org/en/stable/install_and_upgrade/).
 
 Once you have **stack** installed, **git clone** the repository,
 enter the directory, and type
