@@ -8,18 +8,25 @@ can be found at
 [TransLucid and Cartesian Programming](cartesianprogramming.com).
 
 ### Installation
-The interpreter is a standalone **cabal** package, which can only be used
-if you have **ghc** and **cabal** installed.  If you do, then just
-**git clone** the repository, and then run
+The interpreter is a standalone **stack** package, which can only be used
+if you have **stack** installed.
 
-    cabal v2-configure
-    cabal v2-build
+Once you have **stack** installed, **git clone** the repository,
+enter the directory, and type
 
-It will build a binary called **tlghc**.
+    stack build
+
+A binary called **TLghc-exe** will be built. To execute this binary, type
+
+    stack exec TLghc-exe
+
+To run the **TLghc** test suite, type
+
+    stack test
 
 ### Usage
 The interface for **tlghc** is very simple:
-  `tlghc file1 file2 ... fileN`
+  `stack exec TLghc-exe file1 file2 ... fileN`
 will concatenate the _N_ files `file1`, ..., `fileN`,
 then parse them as a TransLucid program, then execute that program.
 
