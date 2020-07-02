@@ -29,7 +29,7 @@ To run the **TLghc** test suite, type
 ### Usage
 The interface for **TLghc-exe** is very simple:
 
-  stack exec TLghc-exe file1 file2 ... fileN
+    stack exec TLghc-exe file1 file2 ... fileN
 
 will concatenate the _N_ files `file1`, ..., `fileN`,
 then parse them as a TransLucid program, then execute that program.
