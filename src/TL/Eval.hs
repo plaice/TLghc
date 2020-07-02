@@ -1,6 +1,6 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
 
-module TL (
+module TL.Eval (
   TLctx, TLenv,
   TLdata(TLbool, TLchar, TLint, TLstr, TLfunc),
   TLuno(TLunNot, TLunNegate),
@@ -20,6 +20,7 @@ module TL (
   ,isDeclDimError,isDeclVarError
   ,isEvalExpr,isEvalExprError
   ,eval
+  ,checkFile
   ,evalFile
 )
 where
@@ -258,6 +259,9 @@ removePrefix' pairs (pairs':l) = (removePrefixOne pairs pairs'):(removePrefix' p
 
 removePrefix [] = []
 removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
+
+checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
+  (length errs1 == 0) && (length errs2 == 0) && (length errs3 == 0)
 
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
   mapM_ (\(TLevalExpr expr ctxRange) ->

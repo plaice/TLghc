@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0cd4c869a28ff7b957b7faa68cc53b478eefc025b5efd6c6a677010440ec179f
+-- hash: 6fb2889a4802df5cf8f3c79a768c23078502db969042f1d021a8843e5eb6e1b0
 
 name:           TLghc
 version:        0.1.0.0
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      TL
-      TLparse
+      TL.Eval
+      TL.Parse
   other-modules:
       Paths_TLghc
   hs-source-dirs:

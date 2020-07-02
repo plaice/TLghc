@@ -1,4 +1,4 @@
-module TLparse (playFile,parserFile)
+module TL.Parse (parseText)
 where
 
 import Text.Parsec
@@ -8,15 +8,10 @@ import Text.Parsec.Token
 import Text.Parsec.Language
 import qualified Data.Array as Array
 import qualified Data.Map as Map
-import TL
+import TL.Eval
 import System.IO
 
-playFile inp = case parse parserFile "" inp of
-                 Left err -> error "playFile: parse failed"
-                 Right ans -> do
-                                putStr . show $ ans
-                                putStrLn "========"
-                                evalFile ans
+parseText programText = parse parserFile "" programText
 
 parserFile :: Parser TLfile
 parserFile =
