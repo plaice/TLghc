@@ -5,7 +5,7 @@
 written in Haskell.  TransLucid is the language being developed to explore
 **Cartesian Programming**.  Presentation and discussion of these ideas
 can be found at
-[TransLucid and Cartesian Programming](cartesianprogramming.com).
+[TransLucid and Cartesian Programming](https://cartesianprogramming.com).
 
 ### Installation
 The interpreter is a standalone Haskell **stack** package, which can only be
