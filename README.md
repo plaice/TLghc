@@ -18,9 +18,7 @@ enter the directory, and type
 
     stack build
 
-A binary called **TLghc-exe** will be built. To execute this binary, type
-
-    stack exec TLghc-exe
+to build a binary called **TLghc-exe**. See **Usage** below.
 
 To run the **TLghc** test suite, type
 

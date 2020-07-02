@@ -5,7 +5,11 @@ import System.Environment
 import TLparse
 
 main :: IO ()
-main = getArgs >>= parse >>= playFile
+main = do
+  args <- getArgs
+  (printAST
+  ast <- parse files
+  playFile ast
 
 parse []     = getContents
 parse fs     = fmap concat $ mapM readFile fs
