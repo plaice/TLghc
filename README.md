@@ -11,7 +11,7 @@ can be found at
 The interpreter is a standalone Haskell **stack** package, which can only be
 used if you have **stack** installed. If you do not have **stack** installed,
 follow the 
-[Stack Install/upgrade Instruction](https://docs.haskellstack.org/en/stable/install_and_upgrade/).
+[Stack Install/upgrade Instructions](https://docs.haskellstack.org/en/stable/install_and_upgrade/).
 
 Once you have **stack** installed, **git clone** the repository,
 enter the directory, and type
