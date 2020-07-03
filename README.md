@@ -66,12 +66,14 @@ The `dim` keyword declares a dimension identifier.
   dimension `d` is declared, whose initial ordinate is set
   to be the result of evaluating expression `expr`.
 
-The `var` keyword declares a variable or function identifier.
+The `var` keyword declares a variable identifier.
 * In the declaration
 
       var x = expr
 
   variable `x` is declared to be equal to expression `expr`.
+
+The `fun` keyword declares a function identifier.
 * In the declaration
 
       fun x.d1...dm = expr
