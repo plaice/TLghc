@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.2.0.0 - 2020-07-01
+
+* Change the interface.
+
 ## 0.1.0.0 - 2020-06-27
 
 * Move to stack. Rewriting of the parser and execution engine.
