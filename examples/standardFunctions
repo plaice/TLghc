@@ -1,24 +1,24 @@
-var index.d = #d
-var index2.d1.d2 = #d1 + #d2
-var first.d(X) = X [d <- 0]
-var next.d(X)  = X [d <- #d + 1]
-var prev.d(X)  = X [d <- #d - 1]
-var fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
-var ybf.d(X,Y) = if #d > -1 then Y else next.d(X)
-var lPair.d(X) = X [d <- #d * 2]
-var rPair.d(X) = X [d <- #d * 2 + 1]
-var evenParent.d(X) = X [d <- #d / 2]
-var oddParent.d(X) = X [d <- #d / 2 + 1]
+fun index.d = #d
+fun index2.d1.d2 = #d1 + #d2
+fun first.d(X) = X [d <- 0]
+fun next.d(X)  = X [d <- #d + 1]
+fun prev.d(X)  = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun ybf.d(X,Y) = if #d > -1 then Y else next.d(X)
+fun lPair.d(X) = X [d <- #d * 2]
+fun rPair.d(X) = X [d <- #d * 2 + 1]
+fun evenParent.d(X) = X [d <- #d / 2]
+fun oddParent.d(X) = X [d <- #d / 2 + 1]
 
-var asa.d(X,Y) = first.d (X wvr.d Y)
+fun asa.d(X,Y) = first.d (X wvr.d Y)
 
-var wvr.d(X,Y) = X [d <- T]
+fun wvr.d(X,Y) = X [d <- T]
   where
     var T = U fby.d U [d <- T+1]
     var U = if Y then #d else next.d(U)
   end
 
-var upon.d(X,Y) = X [d <- W]
+fun upon.d(X,Y) = X [d <- W]
   where
     var W = 0 fby.d (if Y then W+1 else W)
   end

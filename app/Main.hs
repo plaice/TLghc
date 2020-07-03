@@ -14,12 +14,15 @@ main = do
   case parsedText of
     Left err -> error "Parse completely failed"
     Right ans ->
-      do if printAST then do putStr . show $ ans
-                             putStrLn "========"
+      do if printAST
+         then do putStr . show $ ans
+                 putStrLn "========"
          else putStr ""
+         if checkFile ans
+         then putStr ""
+         else error "Parse errors, cannot evaluate"
          if not parseOnly 
-         then if checkFile ans then evalFile ans
-              else error "Parse errors, cannot evaluate"
+         then evalFile ans
          else putStr ""
 
 

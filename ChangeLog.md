@@ -1,5 +1,11 @@
 # Revision history for TLghc
 
+## 0.3.0.0 - 2020-07-03
+
+* Change "var" to "fun" for functions.
+* Ensure parsing goes all the way to EOF.
+* Update README.
+
 ## 0.2.0.0 - 2020-07-01
 
 * Change the interface.

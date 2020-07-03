@@ -16,6 +16,13 @@ parseText programText = parse parserFile "" programText
 parserFile :: Parser TLfile
 parserFile =
   do
+    fileContents <- parserFileContents
+    eof
+    return fileContents
+
+parserFileContents :: Parser TLfile
+parserFileContents =
+  do
     decls <- many parserDecl
     let dims = filter isDeclDim decls
     let vars = filter isDeclVar decls
@@ -75,7 +82,7 @@ parserDeclVarSimple =
 parserDeclVarDim :: Parser TLdecl
 parserDeclVarDim =
   try (do
-         m_reserved "var"
+         m_reserved "fun"
          x <- m_identifier
          m_reservedOp "."
          dimArgs <- parserIdsDots
@@ -87,7 +94,7 @@ parserDeclVarDim =
 parserDeclVarInt :: Parser TLdecl
 parserDeclVarInt =
   try (do
-         m_reserved "var"
+         m_reserved "fun"
          x <- m_identifier
          varArgs <- m_parens parserIds
          m_reservedOp "="
@@ -98,7 +105,7 @@ parserDeclVarInt =
 parserDeclVarDimInt :: Parser TLdecl
 parserDeclVarDimInt =
   try (do
-         m_reserved "var"
+         m_reserved "fun"
          x <- m_identifier
          m_reservedOp "."
          dimArgs <- parserIdsDots
@@ -112,6 +119,7 @@ parserAnyKeyWord :: Parser ()
 parserAnyKeyWord =
         m_reserved "dim"
     <|> m_reserved "var"
+    <|> m_reserved "fun"
     <|> m_reserved "end"
     <|> m_reserved "where"
     <|> m_reserved "evalExpr"
