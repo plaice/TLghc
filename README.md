@@ -30,7 +30,9 @@ The basic interface for **TLghc-exe** is as follows:
     stack exec TLghc-exe file1 file2 ... fileN
 
 will concatenate the _N_ files `file1`, ..., `fileN`,
-then parse them as a TransLucid program, then execute that program.
+then parse them as a TransLucid program, then execute that program,
+and output the result of the execution.
+
 If _N_ = 0, i.e., no files are specified,
 then **TLghc-exe** will read from the standard input.
 
