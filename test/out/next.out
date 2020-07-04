@@ -1,0 +1,6 @@
+TLapply (TLvar "next") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint -1
+       -1: TLint 0
+       0: TLint 1
+       1: TLint 2
+       2: TLint 3

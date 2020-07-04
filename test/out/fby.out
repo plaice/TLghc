@@ -1,0 +1,6 @@
+TLvar "x"
+  d <- -2: TLint 0
+       -1: TLint 0
+       0: TLint 0
+       1: TLint 1
+       2: TLint 2
