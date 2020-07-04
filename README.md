@@ -197,3 +197,32 @@ The file `examples/simpleExamples` contains the following declarations:
     evalExpr X @ [d <- -2 .. 2]
     evalExpr Y @ [d <- -2 .. 2]
     evalExpr index2.d0.d1 @ [d0 <- 1 .. 3, d1 <- 2 .. 4]
+
+The expected output from typing
+
+    stack exec TLghc-exe examples/simpleExamples
+
+is as follows:
+
+    TLvar "X"
+      d <- -2: TLint 0
+           -1: TLint 0
+           0: TLint 0
+           1: TLint 1
+           2: TLint 2
+    TLvar "Y"
+      d <- -2: TLint -2
+           -1: TLint -1
+           0: TLint 0
+           1: TLint 0
+           2: TLint 0
+    TLapply (TLvar "index2") ["d0","d1"] []
+      d0 <- 1, d1 <- 2: TLint 3
+                     3: TLint 4
+                     4: TLint 5
+            2, d1 <- 2: TLint 4
+                     3: TLint 5
+                     4: TLint 6
+            3, d1 <- 2: TLint 5
+                     3: TLint 6
+                     4: TLint 7
