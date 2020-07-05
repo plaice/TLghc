@@ -3,6 +3,7 @@
 ## 0.4.0.0 - 2020-07-04
 
 * Remove printing from the evaluator.
+* Add test suite.
 
 ## 0.3.0.0 - 2020-07-03
 
