@@ -264,23 +264,20 @@ checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
   (length errs1 == 0) && (length errs2 == 0) && (length errs3 == 0)
 
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
-  mapM_ (\(TLevalExpr expr ctxRange) ->
-         let expandedRanges = expandRange ctxRange in
-         let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-         let externDims = Map.fromList $ getDims ctxRange in
-         let (env,ctx) = ctxFromAPI externDims 0 in
-         do
-           putStrLn . show $ expr
-           mapM_ (\(text,pairs) ->
-                  do putStr "  "
-                     putStr $ id text
-                     putStr ": "
-                     putStrLn . show $
-                       eval (TLwhere dims vars funcs (TLat pairs expr))
-                            (Map.fromList []) (Map.fromList [])
-                 )
-                 (zip rangeTexts expandedRanges))
-        evalExprs
+  concat
+  (map (\(TLevalExpr expr ctxRange) ->
+        let expandedRanges = expandRange ctxRange in
+        let rangeTexts = removePrefix (map foldPairs expandedRanges) in
+        let externDims = Map.fromList $ getDims ctxRange in
+        let (env,ctx) = ctxFromAPI externDims 0 in
+        (show expr) ++ "\n" ++ (concat
+        (map (\(text,pairs) ->
+              ("  " ++ (id text) ++ ": " ++
+               (show (eval (TLwhere dims vars funcs (TLat pairs expr))
+                           (Map.fromList []) (Map.fromList []))) ++
+               "\n"))
+            (zip rangeTexts expandedRanges))))
+       evalExprs)
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
