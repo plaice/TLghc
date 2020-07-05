@@ -43,7 +43,7 @@ executables:
 
 tests:
   TLghc-test:
-    main:                Spec.hs
+    main:                TLSpec.hs
     source-dirs:         test
     ghc-options:
     - -threaded

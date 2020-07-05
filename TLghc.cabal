@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 64067e4755684a7668d9f89dd3b587e19ed011df8e784b830d6a17228cdc1ccb
+-- hash: e494a5ddc142582fd9f507fbdf80200eb9fc5356df133a1ae78830d83c12aad0
 
 name:           TLghc
 version:        0.3.0.0
@@ -62,7 +62,7 @@ executable TLghc-exe
 
 test-suite TLghc-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: TLSpec.hs
   other-modules:
       Paths_TLghc
   hs-source-dirs:
