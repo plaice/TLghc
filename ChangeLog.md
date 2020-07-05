@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.4.0.0 - 2020-07-04
+
+* Remove printing from the evaluator.
+
 ## 0.3.0.0 - 2020-07-03
 
 * Change "var" to "fun" for functions.
