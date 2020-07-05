@@ -1,0 +1,9 @@
+TLfile
+  TLdeclDim "d"
+    TLconst TLint 0
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLevalExpr TLapply TLvar "index"
+      "d"
+    [("d",(-2,2))]
+========

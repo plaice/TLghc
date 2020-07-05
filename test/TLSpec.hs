@@ -13,9 +13,16 @@ main = do
   testOne "ybf"
 
 testOne func = do
-  textIn <- readFile ("test/in/" ++ func ++ ".tl")
+  textTL <- readFile ("test/tl/" ++ func ++ ".tl")
+  textAST <- readFile ("test/ast/" ++ func ++ ".ast")
   textOut <- readFile ("test/out/" ++ func ++ ".out")
   hspec $ do
     describe func $ do
-      it ("tests the " ++ func ++ " function") $
-        processText textIn False False `shouldBe` Right textOut
+      it ("tests the " ++ func ++ " function (parse)") $
+        processText textTL False True `shouldBe` Right ""
+      it ("tests the " ++ func ++ " function (eval)") $
+        processText textTL False False `shouldBe` Right textOut
+      it ("tests the " ++ func ++ " function (printAST)") $
+        processText textTL True True `shouldBe` Right textAST
+      it ("tests the " ++ func ++ " function (printAST + eval)") $
+        processText textTL True False `shouldBe` Right (textAST ++ textOut)

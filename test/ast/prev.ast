@@ -1,0 +1,18 @@
+TLfile
+  TLdeclDim "d"
+    TLconst TLint 0
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLevalExpr TLapply TLvar "prev"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+========
