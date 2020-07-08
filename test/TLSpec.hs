@@ -19,6 +19,7 @@ main = do
   testOne "primes"
   testOne "ackermann"
   testOne "power"
+  testOne "powerF"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")
