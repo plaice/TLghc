@@ -1,0 +1,81 @@
+TLfile
+  TLdeclDim "d"
+    TLconst TLint 0
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "first" ["D"] ["X"]
+    TLat
+      "D"
+      TLconst TLint 0
+      TLvar "X"
+  TLdeclFunc "next" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "wvr" ["D"] ["X","Y"]
+    TLwhere
+      TLdeclVar "t"
+        TLapply TLvar "fby"
+          "D"
+          TLvar "u"
+          TLat
+            "D"
+            TLbinop TLbinPlus
+              TLvar "t"
+              TLconst TLint 1
+            TLvar "u"
+      TLdeclVar "u"
+        TLcond
+          TLvar "Y"
+          TLhash "D"
+          TLapply TLvar "next"
+            "D"
+            TLvar "u"
+      TLat
+        "D"
+        TLvar "t"
+        TLvar "X"
+  TLdeclFunc "primes" ["D"] []
+    TLwhere
+      TLdeclDim "z"
+        TLconst TLint 0
+      TLdeclVar "f"
+        TLapply TLvar "fby"
+          "D"
+          TLbinop TLbinPlus
+            TLhash "z"
+            TLconst TLint 2
+          TLapply TLvar "wvr"
+            "z"
+            TLvar "f"
+            TLbinop TLbinNE
+              TLbinop TLbinMod
+                TLvar "f"
+                TLapply TLvar "first"
+                  "z"
+                  TLvar "f"
+              TLconst TLint 0
+      TLvar "f"
+  TLevalExpr TLapply TLvar "primes"
+      "d"
+    [("d",(0,7))]
+========

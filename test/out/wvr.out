@@ -1,0 +1,9 @@
+TLvar "z"
+  d <- 0: TLint 0
+       1: TLint 2
+       2: TLint 4
+       3: TLint 6
+       4: TLint 8
+       5: TLint 10
+       6: TLint 12
+       7: TLint 14

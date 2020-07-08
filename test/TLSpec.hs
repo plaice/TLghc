@@ -15,6 +15,8 @@ main = do
   testOne "default"
   testOne "factorial"
   testOne "fibonacci"
+  testOne "wvr"
+  testOne "primes"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")

@@ -1,0 +1,9 @@
+TLapply (TLvar "primes") ["d"] []
+  d <- 0: TLint 2
+       1: TLint 3
+       2: TLint 5
+       3: TLint 7
+       4: TLint 11
+       5: TLint 13
+       6: TLint 17
+       7: TLint 19
