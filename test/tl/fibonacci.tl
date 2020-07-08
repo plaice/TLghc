@@ -1,18 +1,15 @@
 fun lParent.D(X)  = X [D <- #D / 2 ]
 fun rParent.D(X)  = X [D <- #D / 2 + 1]
-fun even.D = (#D % 2) == 0
 fun prev.D(X)  = X [D <- #D - 1]
 fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun cby.D(N,X,Y) = if #D < N then X else Y
+fun alt.D(X,Y) = if #D %2 == 0 then X else Y
+fun cby3.D(X,Y) = if #D < 3 then X else Y
 fun fibonacci(N) = f
 where
   dim d <- N
-  var f = cby.d (3,
-                 0 fby.d 1,
-                 if even.d
-                 then lParent.d(f) * (rParent.d(f) * 2 - lParent.d(f))
-                 else lParent.d(f) * lParent.d(f) +
-                      rParent.d(f) * rParent.d(f))
+  var f = (0 fby.d 1) cby3.d
+          ((lParent.d(f) * (rParent.d(f) * 2 - lParent.d(f))) alt.d
+           (lParent.d(f) * lParent.d(f) + rParent.d(f) * rParent.d(f)))
 end
 evalExpr fibonacci(0) @ []
 evalExpr fibonacci(1) @ []

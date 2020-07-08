@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.4.0.1 - 2020-07-08
+
+* Add alt, cby, cby2, cby3 primitives.
+
 ## 0.4.0.0 - 2020-07-04
 
 * Remove printing from the evaluator.

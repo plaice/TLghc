@@ -15,12 +15,6 @@ TLfile
           TLconst TLint 2
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "even" ["D"] []
-    TLbinop TLbinEQ
-      TLbinop TLbinMod
-        TLhash "D"
-        TLconst TLint 2
-      TLconst TLint 0
   TLdeclFunc "prev" ["D"] ["X"]
     TLat
       "D"
@@ -37,11 +31,20 @@ TLfile
       TLapply TLvar "prev"
         "D"
         TLvar "Y"
-  TLdeclFunc "cby" ["D"] ["N","X","Y"]
+  TLdeclFunc "alt" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinEQ
+        TLbinop TLbinMod
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 0
+      TLvar "X"
+      TLvar "Y"
+  TLdeclFunc "cby3" ["D"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
         TLhash "D"
-        TLvar "N"
+        TLconst TLint 3
       TLvar "X"
       TLvar "Y"
   TLdeclFunc "fibonacci" [] ["N"]
@@ -49,16 +52,14 @@ TLfile
       TLdeclDim "d"
         TLvar "N"
       TLdeclVar "f"
-        TLapply TLvar "cby"
+        TLapply TLvar "cby3"
           "d"
-          TLconst TLint 3
           TLapply TLvar "fby"
             "d"
             TLconst TLint 0
             TLconst TLint 1
-          TLcond
-            TLapply TLvar "even"
-              "d"
+          TLapply TLvar "alt"
+            "d"
             TLbinop TLbinTimes
               TLapply TLvar "lParent"
                 "d"

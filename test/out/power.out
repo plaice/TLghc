@@ -1,0 +1,24 @@
+TLapply (TLvar "power") [] [TLconst TLint 0,TLconst TLint 1]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 1,TLconst TLint 1]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 2,TLconst TLint 1]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 3,TLconst TLint 1]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 0,TLconst TLint 2]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 1,TLconst TLint 2]
+  : TLint 2
+TLapply (TLvar "power") [] [TLconst TLint 2,TLconst TLint 2]
+  : TLint 4
+TLapply (TLvar "power") [] [TLconst TLint 3,TLconst TLint 2]
+  : TLint 8
+TLapply (TLvar "power") [] [TLconst TLint 0,TLconst TLint 3]
+  : TLint 1
+TLapply (TLvar "power") [] [TLconst TLint 1,TLconst TLint 3]
+  : TLint 3
+TLapply (TLvar "power") [] [TLconst TLint 2,TLconst TLint 3]
+  : TLint 9
+TLapply (TLvar "power") [] [TLconst TLint 3,TLconst TLint 3]
+  : TLint 27

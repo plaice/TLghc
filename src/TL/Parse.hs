@@ -242,6 +242,10 @@ table = [ [ parserUnop  "!"  TLunNot
           , parserTLop "asa"
           , parserTLop "wvr"
           , parserTLop "upon"
+          , parserTLop "alt"
+          , parserTLop "cby"
+          , parserTLop "cby2"
+          , parserTLop "cby3"
           ]
         ]
 
