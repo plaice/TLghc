@@ -5,16 +5,15 @@ TLfile
     TLhash "D"
   TLdeclFunc "default" ["D"] ["N","X","Y"]
     TLcond
-      TLbinop TLbinLT
-        TLhash "D"
-        TLconst TLint 1
-      TLvar "X"
-      TLcond
+      TLbinop TLbinOr
+        TLbinop TLbinLT
+          TLhash "D"
+          TLconst TLint 1
         TLbinop TLbinGT
           TLhash "D"
           TLvar "N"
-        TLvar "X"
-        TLvar "Y"
+      TLvar "X"
+      TLvar "Y"
   TLevalExpr TLapply TLvar "default"
       "d"
       TLconst TLint 0

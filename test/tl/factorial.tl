@@ -9,7 +9,7 @@ where
   dim d <- N
   var il = 0 fby.d (1 fby.d (1 + rParent.d(il)))
 end
-fun default.D(N,X,Y) = if #D < 1 then X else if #D > N then X else Y
+fun default.D(N,X,Y) = if #D < 1 || #D > N then X else Y
 fun factorial(N) = f
 where
   dim d1 <- ilog(N)
@@ -26,3 +26,5 @@ evalExpr factorial(5) @ []
 evalExpr factorial(6) @ []
 evalExpr factorial(7) @ []
 evalExpr factorial(8) @ []
+evalExpr factorial(100) @ []
+evalExpr factorial(1000) @ []
