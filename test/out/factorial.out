@@ -1,0 +1,18 @@
+TLapply (TLvar "factorial") [] [TLconst TLint 0]
+  : TLint 1
+TLapply (TLvar "factorial") [] [TLconst TLint 1]
+  : TLint 1
+TLapply (TLvar "factorial") [] [TLconst TLint 2]
+  : TLint 2
+TLapply (TLvar "factorial") [] [TLconst TLint 3]
+  : TLint 6
+TLapply (TLvar "factorial") [] [TLconst TLint 4]
+  : TLint 24
+TLapply (TLvar "factorial") [] [TLconst TLint 5]
+  : TLint 120
+TLapply (TLvar "factorial") [] [TLconst TLint 6]
+  : TLint 720
+TLapply (TLvar "factorial") [] [TLconst TLint 7]
+  : TLint 5040
+TLapply (TLvar "factorial") [] [TLconst TLint 8]
+  : TLint 40320

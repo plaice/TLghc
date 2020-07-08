@@ -1,0 +1,125 @@
+TLfile
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "rParent" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLbinop TLbinDiv
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "lChild" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinTimes
+        TLhash "D"
+        TLconst TLint 2
+      TLvar "X"
+  TLdeclFunc "rChild" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLbinop TLbinTimes
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "ilog" [] ["N"]
+    TLwhere
+      TLdeclDim "d"
+        TLvar "N"
+      TLdeclVar "il"
+        TLapply TLvar "fby"
+          "d"
+          TLconst TLint 0
+          TLapply TLvar "fby"
+            "d"
+            TLconst TLint 1
+            TLbinop TLbinPlus
+              TLconst TLint 1
+              TLapply TLvar "rParent"
+                "d"
+                TLvar "il"
+      TLvar "il"
+  TLdeclFunc "default" ["D"] ["N","X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLcond
+        TLbinop TLbinGT
+          TLhash "D"
+          TLvar "N"
+        TLvar "X"
+        TLvar "Y"
+  TLdeclFunc "factorial" [] ["N"]
+    TLwhere
+      TLdeclDim "d1"
+        TLapply TLvar "ilog"
+          TLvar "N"
+      TLdeclDim "d2"
+        TLconst TLint 0
+      TLdeclVar "f"
+        TLapply TLvar "fby"
+          "d1"
+          TLapply TLvar "default"
+            "d2"
+            TLvar "N"
+            TLconst TLint 1
+            TLapply TLvar "index"
+              "d2"
+          TLbinop TLbinTimes
+            TLapply TLvar "lChild"
+              "d2"
+              TLvar "f"
+            TLapply TLvar "rChild"
+              "d2"
+              TLvar "f"
+      TLvar "f"
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 4
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 5
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 6
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 7
+    []
+  TLevalExpr TLapply TLvar "factorial"
+      TLconst TLint 8
+    []
+========

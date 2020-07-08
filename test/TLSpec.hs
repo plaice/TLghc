@@ -12,6 +12,8 @@ main = do
   testOne "fby"
   testOne "ybf"
   testOne "ilog"
+  testOne "default"
+  testOne "factorial"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")
