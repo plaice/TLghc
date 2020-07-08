@@ -8,8 +8,6 @@ TLfile
       TLbinop TLbinPlus
         TLvar "x"
         TLconst TLint 1
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
   TLdeclFunc "prev" ["D"] ["X"]
     TLat
       "D"

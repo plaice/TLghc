@@ -1,4 +1,3 @@
-fun index.D = #D
 fun prev.D(X)  = X [D <- #D - 1]
 fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
 dim d <- 0

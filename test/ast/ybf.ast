@@ -8,8 +8,6 @@ TLfile
         TLvar "x"
         TLconst TLint 1
       TLconst TLint 0
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
   TLdeclFunc "next" ["D"] ["X"]
     TLat
       "D"
