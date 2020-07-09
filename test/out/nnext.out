@@ -1,0 +1,78 @@
+TLapply (TLvar "index") ["d"] []
+  d <- -2: TLint -2
+       -1: TLint -1
+       0: TLint 0
+       1: TLint 1
+       2: TLint 2
+TLapply (TLvar "next0") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint -2
+       -1: TLint -1
+       0: TLint 0
+       1: TLint 1
+       2: TLint 2
+TLapply (TLvar "next1") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint -1
+       -1: TLint 0
+       0: TLint 1
+       1: TLint 2
+       2: TLint 3
+TLapply (TLvar "next2") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 0
+       -1: TLint 1
+       0: TLint 2
+       1: TLint 3
+       2: TLint 4
+TLapply (TLvar "next3") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 1
+       -1: TLint 2
+       0: TLint 3
+       1: TLint 4
+       2: TLint 5
+TLapply (TLvar "next4") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 2
+       -1: TLint 3
+       0: TLint 4
+       1: TLint 5
+       2: TLint 6
+TLapply (TLvar "next5") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 3
+       -1: TLint 4
+       0: TLint 5
+       1: TLint 6
+       2: TLint 7
+TLapply (TLvar "nextF0") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint -2
+       -1: TLint -1
+       0: TLint 0
+       1: TLint 1
+       2: TLint 2
+TLapply (TLvar "nextF1") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint -1
+       -1: TLint 0
+       0: TLint 1
+       1: TLint 2
+       2: TLint 3
+TLapply (TLvar "nextF2") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 0
+       -1: TLint 1
+       0: TLint 2
+       1: TLint 3
+       2: TLint 4
+TLapply (TLvar "nextF3") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 1
+       -1: TLint 2
+       0: TLint 3
+       1: TLint 4
+       2: TLint 5
+TLapply (TLvar "nextF4") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 2
+       -1: TLint 3
+       0: TLint 4
+       1: TLint 5
+       2: TLint 6
+TLapply (TLvar "nextF5") ["d"] [TLapply (TLvar "index") ["d"] []]
+  d <- -2: TLint 3
+       -1: TLint 4
+       0: TLint 5
+       1: TLint 6
+       2: TLint 7

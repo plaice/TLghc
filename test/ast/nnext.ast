@@ -1,0 +1,158 @@
+TLfile
+  TLdeclDim "d"
+    TLconst TLint 0
+  TLdeclVar "next0"
+    TLapply TLvar "nnext"
+      TLconst TLint 0
+  TLdeclVar "next1"
+    TLapply TLvar "nnext"
+      TLconst TLint 1
+  TLdeclVar "next2"
+    TLapply TLvar "nnext"
+      TLconst TLint 2
+  TLdeclVar "next3"
+    TLapply TLvar "nnext"
+      TLconst TLint 3
+  TLdeclVar "next4"
+    TLapply TLvar "nnext"
+      TLconst TLint 4
+  TLdeclVar "next5"
+    TLapply TLvar "nnext"
+      TLconst TLint 5
+  TLdeclVar "nextF0"
+    TLapply TLvar "nnextF"
+      TLconst TLint 0
+  TLdeclVar "nextF1"
+    TLapply TLvar "nnextF"
+      TLconst TLint 1
+  TLdeclVar "nextF2"
+    TLapply TLvar "nnextF"
+      TLconst TLint 2
+  TLdeclVar "nextF3"
+    TLapply TLvar "nnextF"
+      TLconst TLint 3
+  TLdeclVar "nextF4"
+    TLapply TLvar "nnextF"
+      TLconst TLint 4
+  TLdeclVar "nextF5"
+    TLapply TLvar "nnextF"
+      TLconst TLint 5
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "next" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "nnext" [] ["N"]
+    TLwhere
+      TLdeclFunc "nexts" ["d"] ["x"]
+        TLat
+          "d"
+          TLbinop TLbinPlus
+            TLhash "d"
+            TLvar "N"
+          TLvar "x"
+      TLvar "nexts"
+  TLdeclFunc "nnextF" [] ["N"]
+    TLwhere
+      TLdeclDim "dN"
+        TLvar "N"
+      TLdeclVar "nexts"
+        TLapply TLvar "fby"
+          "dN"
+          TLfn
+            ["d"]
+            ["x"]
+            TLvar "x"
+          TLfn
+            ["d"]
+            ["x"]
+            TLapply TLvar "next"
+              "d"
+              TLapply TLvar "nexts"
+                "d"
+                TLvar "x"
+      TLvar "nexts"
+  TLevalExpr TLapply TLvar "index"
+      "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next0"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next1"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next2"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next3"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next4"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "next5"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF0"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF1"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF2"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF3"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF4"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+  TLevalExpr TLapply TLvar "nextF5"
+      "d"
+      TLapply TLvar "index"
+        "d"
+    [("d",(-2,2))]
+========

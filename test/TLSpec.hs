@@ -22,6 +22,7 @@ main = do
   testOne "powerF"
   testOne "mm"
   testOne "funCalls"
+  testOne "nnext"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")
