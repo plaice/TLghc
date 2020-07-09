@@ -1,0 +1,112 @@
+TLfile
+  TLdeclFunc "lParent" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinDiv
+        TLhash "D"
+        TLconst TLint 2
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "alt" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinEQ
+        TLbinop TLbinMod
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 0
+      TLvar "X"
+      TLvar "Y"
+  TLdeclFunc "cby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLvar "Y"
+  TLdeclFunc "power" [] ["N","X"]
+    TLwhere
+      TLdeclDim "d"
+        TLvar "N"
+      TLdeclVar "p"
+        TLapply TLvar "cby"
+          "d"
+          TLconst TLint 1
+          TLapply TLvar "alt"
+            "d"
+            TLbinop TLbinTimes
+              TLapply TLvar "lParent"
+                "d"
+                TLvar "p"
+              TLapply TLvar "lParent"
+                "d"
+                TLvar "p"
+            TLbinop TLbinTimes
+              TLvar "X"
+              TLapply TLvar "prev"
+                "d"
+                TLvar "p"
+      TLvar "p"
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 0
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 1
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 2
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 3
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 0
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 1
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 2
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 3
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 0
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 1
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 2
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "power"
+      TLconst TLint 3
+      TLconst TLint 3
+    []
+========

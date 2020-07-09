@@ -1,0 +1,116 @@
+TLfile
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "next" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "ackermann" [] ["M","N"]
+    TLwhere
+      TLdeclDim "dm"
+        TLvar "M"
+      TLdeclDim "dn"
+        TLvar "N"
+      TLdeclVar "f"
+        TLapply TLvar "fby"
+          "dm"
+          TLapply TLvar "next"
+            "dn"
+            TLapply TLvar "index"
+              "dn"
+          TLapply TLvar "fby"
+            "dn"
+            TLapply TLvar "next"
+              "dn"
+              TLvar "f"
+            TLat
+              "dn"
+              TLapply TLvar "next"
+                "dm"
+                TLvar "f"
+              TLvar "f"
+      TLvar "f"
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 0
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 0
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 0
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 1
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 1
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 1
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 1
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 2
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 2
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 2
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 2
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 3
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 3
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 3
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 3
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "ackermann"
+      TLconst TLint 4
+      TLconst TLint 0
+    []
+========

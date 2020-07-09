@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f11f7e4f5e44baf07b0317267164f0ca9b70020f58906c573c0f4232cc90e9c2
+-- hash: c661ff5d6ff1c74656480361c95f4b498a10b13e5a955d58744ba7503790bcb1
 
 name:           TLghc
-version:        0.3.0.0
+version:        0.4.0.1
 description:    Please see the README on GitHub at <https://github.com/githubuser/TLghc#readme>
 homepage:       https://github.com/plaice/TLghc#readme
 bug-reports:    https://github.com/plaice/TLghc/issues
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      TL
       TL.Eval
       TL.Parse
   other-modules:
@@ -61,7 +62,7 @@ executable TLghc-exe
 
 test-suite TLghc-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: TLSpec.hs
   other-modules:
       Paths_TLghc
   hs-source-dirs:

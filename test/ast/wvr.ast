@@ -1,0 +1,68 @@
+TLfile
+  TLdeclDim "d"
+    TLconst TLint 0
+  TLdeclVar "z"
+    TLapply TLvar "wvr"
+      "d"
+      TLapply TLvar "index"
+        "d"
+      TLapply TLvar "even"
+        TLapply TLvar "index"
+          "d"
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "next" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "wvr" ["D"] ["X","Y"]
+    TLwhere
+      TLdeclVar "t"
+        TLapply TLvar "fby"
+          "D"
+          TLvar "u"
+          TLat
+            "D"
+            TLbinop TLbinPlus
+              TLvar "t"
+              TLconst TLint 1
+            TLvar "u"
+      TLdeclVar "u"
+        TLcond
+          TLvar "Y"
+          TLhash "D"
+          TLapply TLvar "next"
+            "D"
+            TLvar "u"
+      TLat
+        "D"
+        TLvar "t"
+        TLvar "X"
+  TLdeclFunc "even" [] ["X"]
+    TLbinop TLbinEQ
+      TLbinop TLbinMod
+        TLvar "X"
+        TLconst TLint 2
+      TLconst TLint 0
+  TLevalExpr TLvar "z"
+    [("d",(0,7))]
+========

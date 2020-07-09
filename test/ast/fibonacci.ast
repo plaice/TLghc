@@ -1,0 +1,125 @@
+TLfile
+  TLdeclFunc "lParent" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinDiv
+        TLhash "D"
+        TLconst TLint 2
+      TLvar "X"
+  TLdeclFunc "rParent" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinPlus
+        TLbinop TLbinDiv
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "alt" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinEQ
+        TLbinop TLbinMod
+          TLhash "D"
+          TLconst TLint 2
+        TLconst TLint 0
+      TLvar "X"
+      TLvar "Y"
+  TLdeclFunc "cby3" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 3
+      TLvar "X"
+      TLvar "Y"
+  TLdeclFunc "fibonacci" [] ["N"]
+    TLwhere
+      TLdeclDim "d"
+        TLvar "N"
+      TLdeclVar "f"
+        TLapply TLvar "cby3"
+          "d"
+          TLapply TLvar "fby"
+            "d"
+            TLconst TLint 0
+            TLconst TLint 1
+          TLapply TLvar "alt"
+            "d"
+            TLbinop TLbinTimes
+              TLapply TLvar "lParent"
+                "d"
+                TLvar "f"
+              TLbinop TLbinMinus
+                TLbinop TLbinTimes
+                  TLapply TLvar "rParent"
+                    "d"
+                    TLvar "f"
+                  TLconst TLint 2
+                TLapply TLvar "lParent"
+                  "d"
+                  TLvar "f"
+            TLbinop TLbinPlus
+              TLbinop TLbinTimes
+                TLapply TLvar "lParent"
+                  "d"
+                  TLvar "f"
+                TLapply TLvar "lParent"
+                  "d"
+                  TLvar "f"
+              TLbinop TLbinTimes
+                TLapply TLvar "rParent"
+                  "d"
+                  TLvar "f"
+                TLapply TLvar "rParent"
+                  "d"
+                  TLvar "f"
+      TLvar "f"
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 0
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 1
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 2
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 3
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 4
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 5
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 6
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 7
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 8
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 100
+    []
+  TLevalExpr TLapply TLvar "fibonacci"
+      TLconst TLint 1000
+    []
+========
