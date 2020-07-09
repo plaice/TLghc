@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c661ff5d6ff1c74656480361c95f4b498a10b13e5a955d58744ba7503790bcb1
+-- hash: 3178e8e6e6890aea3dc11d1a1f71017cc792a4e54bddb672ee7ab0dee3bc861b
 
 name:           TLghc
-version:        0.4.0.1
+version:        0.4.0.2
 description:    Please see the README on GitHub at <https://github.com/githubuser/TLghc#readme>
 homepage:       https://github.com/plaice/TLghc#readme
 bug-reports:    https://github.com/plaice/TLghc/issues

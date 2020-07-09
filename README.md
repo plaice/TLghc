@@ -162,30 +162,13 @@ the manipulation of a multidimensional context. The syntactic elements are:
 ### Simple examples
 The file `examples/simpleExamples` contains the following declarations:
 
-    fun index.d = #d
     fun index2.d1.d2 = #d1 + #d2
-    fun first.d(X) = X [d <- 0]
-    fun next.d(X)  = X [d <- #d + 1]
+
     fun prev.d(X)  = X [d <- #d - 1]
+    fun next.d(X)  = X [d <- #d + 1]
+
     fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
     fun ybf.d(X,Y) = if #d > -1 then Y else next.d(X)
-    fun lPair.d(X) = X [d <- #d * 2]
-    fun rPair.d(X) = X [d <- #d * 2 + 1]
-    fun evenParent.d(X) = X [d <- #d / 2]
-    fun oddParent.d(X) = X [d <- #d / 2 + 1]
-
-    fun asa.d(X,Y) = first.d (X wvr.d Y)
-
-    fun wvr.d(X,Y) = X [d <- T]
-      where
-        var T = U fby.d U [d <- T+1]
-        var U = if Y then #d else next.d(U)
-      end
-
-    fun upon.d(X,Y) = X [d <- W]
-      where
-        var W = 0 fby.d (if Y then W+1 else W)
-      end
 
     dim d  <- 0
     dim d0 <- 0
@@ -226,3 +209,24 @@ is as follows:
             3, d1 <- 2: TLint 5
                      3: TLint 6
                      4: TLint 7
+
+### Standard Functions
+The file `examples/standardFunctions` contains the declarations for
+a number of commonly used TransLucid functions.
+
+The uses for these functions can be found in the `test/tl` directory.
+The expected output for, say, running
+
+    stack exec TLghc-exe test/tl/factorial.tl
+
+can be found in file
+
+    test/out/factorial.out
+
+The expected output for, say, running
+
+    stack exec TLghc-exe -- --printAST --parseOnly test/tl/factorial.tl
+
+can be found in file
+
+    test/ast/factorial.ast

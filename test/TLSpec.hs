@@ -4,6 +4,7 @@ import TL
 
 main :: IO ()
 main = do
+  testOne "empty"
   testOne "index"
   testOne "index2"
   testOne "first"

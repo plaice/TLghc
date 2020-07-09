@@ -1,22 +1,43 @@
 fun index.d = #d
 fun index2.d1.d2 = #d1 + #d2
+
 fun first.d(X) = X [d <- 0]
-fun next.d(X)  = X [d <- #d + 1]
 fun prev.d(X)  = X [d <- #d - 1]
+fun next.d(X)  = X [d <- #d + 1]
+
 fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
 fun ybf.d(X,Y) = if #d > -1 then Y else next.d(X)
-fun lPair.d(X) = X [d <- #d * 2]
-fun rPair.d(X) = X [d <- #d * 2 + 1]
-fun evenParent.d(X) = X [d <- #d / 2]
-fun oddParent.d(X) = X [d <- #d / 2 + 1]
+fun alt.d(X,Y) = if #d %2 == 0 then X else Y
+fun cby.d(X,Y) = if #d < 1 then X else Y
+fun cby2.d(X,Y) = if #d < 2 then X else Y
+fun cby3.d(X,Y) = if #d < 3 then X else Y
 
-fun asa.d(X,Y) = first.d (X wvr.d Y)
+fun lChild.d(X) = X [d <- #d * 2]
+fun rChild.d(X) = X [d <- #d * 2 + 1]
+fun lParent.d(X) = X [d <- #d / 2]
+fun rParent.d(X) = X [d <- #d / 2 + 1]
+
+fun default.d(n,X,Y) = if #d < 1 || #d > n then X else Y
+fun rotate.d1.d2(X) = X [ d1 <- #d2 ]
+
+fun ilog(n) = il
+where
+  dim d <- n
+  var il = 0 fby.d (1 fby.d (1 + rParent.d(il)))
+end
+
+fun sum.d(N,X) = Y [ d <- N]
+where
+  var Y = 0 fby.d (X + Y)
+end
 
 fun wvr.d(X,Y) = X [d <- T]
   where
     var T = U fby.d U [d <- T+1]
     var U = if Y then #d else next.d(U)
   end
+
+fun asa.d(X,Y) = first.d (X wvr.d Y)
 
 fun upon.d(X,Y) = X [d <- W]
   where

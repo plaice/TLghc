@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.4.0.2 - 2020-07-09
+
+* Finish initial test suite, basic examples.
+
 ## 0.4.0.1 - 2020-07-08
 
 * Add alt, cby, cby2, cby3 primitives.
