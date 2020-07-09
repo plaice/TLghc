@@ -1,8 +1,8 @@
-fun lParent.d(X) = X [d <- #d / 2 ]
+fun lParent.d(X) = X [d <- #d / 2]
 fun rParent.d(X) = X [d <- #d / 2 + 1]
 fun prev.d(X) = X [d <- #d - 1]
 fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
-fun alt.d(X,Y) = if #d %2 == 0 then X else Y
+fun alt.d(X,Y) = if #d % 2 == 0 then X else Y
 fun cby3.d(X,Y) = if #d < 3 then X else Y
 fun fibonacci(n) = F
 where

@@ -6,7 +6,7 @@ fun next.d(X)  = X [d <- #d + 1]
 fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
 fun ybf.d(X,Y) = if #d > -1 then Y else next.d(X)
 
-dim d  <- 0
+dim d <- 0
 dim d0 <- 0
 dim d1 <- 0
 

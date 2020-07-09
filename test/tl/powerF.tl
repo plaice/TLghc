@@ -1,7 +1,7 @@
-fun lParent.d(X) = X [d <- #d / 2 ]
+fun lParent.d(X) = X [d <- #d / 2]
 fun prev.d(X) = X [d <- #d - 1]
 fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
-fun alt.d(X,Y) = if #d %2 == 0 then X else Y
+fun alt.d(X,Y) = if #d % 2 == 0 then X else Y
 fun cby.d(X,Y) = if #d < 1 then X else Y
 fun powerF(n) = P
 where
