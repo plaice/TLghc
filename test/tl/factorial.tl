@@ -1,8 +1,8 @@
 fun index.D = #D
-fun rParent.D(X)  = X [D <- #D / 2 + 1]
-fun lChild.D(X)  = X [D <- #D * 2]
-fun rChild.D(X)  = X [D <- #D * 2 + 1]
-fun prev.D(X)  = X [D <- #D - 1]
+fun rParent.D(X) = X [D <- #D / 2 + 1]
+fun lChild.D(X) = X [D <- #D * 2]
+fun rChild.D(X) = X [D <- #D * 2 + 1]
+fun prev.D(X) = X [D <- #D - 1]
 fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
 fun ilog(N) = il
 where

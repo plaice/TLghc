@@ -1,0 +1,20 @@
+TLvar "x"
+  drow <- 0, dcol <- 0: TLint 0
+                     1: TLint 1
+                     2: TLint 2
+          1, dcol <- 0: TLint 1
+                     1: TLint 2
+                     2: TLint 3
+          2, dcol <- 0: TLint 2
+                     1: TLint 3
+                     2: TLint 4
+TLapply (TLvar "mm") ["drow","dcol"] [TLconst TLint 3,TLvar "x",TLvar "x"]
+  drow <- 0, dcol <- 0: TLint 5
+                     1: TLint 8
+                     2: TLint 11
+          1, dcol <- 0: TLint 8
+                     1: TLint 14
+                     2: TLint 20
+          2, dcol <- 0: TLint 11
+                     1: TLint 20
+                     2: TLint 29

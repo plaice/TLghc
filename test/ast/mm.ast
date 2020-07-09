@@ -1,0 +1,81 @@
+TLfile
+  TLdeclDim "drow"
+    TLconst TLint 0
+  TLdeclDim "dcol"
+    TLconst TLint 0
+  TLdeclVar "x"
+    TLbinop TLbinPlus
+      TLapply TLvar "index"
+        "drow"
+      TLapply TLvar "index"
+        "dcol"
+  TLdeclFunc "index" ["D"] []
+    TLhash "D"
+  TLdeclFunc "prev" ["D"] ["X"]
+    TLat
+      "D"
+      TLbinop TLbinMinus
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+  TLdeclFunc "fby" ["D"] ["X","Y"]
+    TLcond
+      TLbinop TLbinLT
+        TLhash "D"
+        TLconst TLint 1
+      TLvar "X"
+      TLapply TLvar "prev"
+        "D"
+        TLvar "Y"
+  TLdeclFunc "rotate" ["D1","D2"] ["X"]
+    TLat
+      "D1"
+      TLhash "D2"
+      TLvar "X"
+  TLdeclFunc "sum" ["D"] ["N","X"]
+    TLwhere
+      TLdeclVar "y"
+        TLapply TLvar "fby"
+          "D"
+          TLconst TLint 0
+          TLbinop TLbinPlus
+            TLvar "X"
+            TLvar "y"
+      TLat
+        "D"
+        TLvar "N"
+        TLvar "y"
+  TLdeclFunc "mm" ["Drow","Dcol"] ["K","X","Y"]
+    TLwhere
+      TLdeclDim "d"
+        TLconst TLint 0
+      TLdeclVar "xp"
+        TLapply TLvar "rotate"
+          "Drow"
+          "d"
+          TLvar "X"
+      TLdeclVar "yp"
+        TLapply TLvar "rotate"
+          "Dcol"
+          "d"
+          TLvar "Y"
+      TLdeclVar "z"
+        TLbinop TLbinTimes
+          TLvar "xp"
+          TLvar "yp"
+      TLdeclVar "w"
+        TLapply TLvar "sum"
+          "d"
+          TLvar "K"
+          TLvar "z"
+      TLvar "w"
+  TLevalExpr TLvar "x"
+    [("drow",(0,2)),("dcol",(0,2))]
+  TLevalExpr TLapply TLvar "mm"
+      "drow"
+      "dcol"
+      TLconst TLint 3
+      TLvar "x"
+      TLvar "x"
+    [("drow",(0,2)),("dcol",(0,2))]
+========

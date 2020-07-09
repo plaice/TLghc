@@ -20,6 +20,7 @@ main = do
   testOne "ackermann"
   testOne "power"
   testOne "powerF"
+  testOne "mm"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")

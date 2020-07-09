@@ -1,5 +1,5 @@
-fun lParent.D(X)  = X [D <- #D / 2 ]
-fun prev.D(X)  = X [D <- #D - 1]
+fun lParent.D(X) = X [D <- #D / 2 ]
+fun prev.D(X) = X [D <- #D - 1]
 fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
 fun alt.D(X,Y) = if #D %2 == 0 then X else Y
 fun cby.D(X,Y) = if #D < 1 then X else Y

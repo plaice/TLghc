@@ -1,6 +1,6 @@
-fun index.D  = #D
-fun next.D(X)  = X [D <- #D + 1]
-fun prev.D(X)  = X [D <- #D - 1]
+fun index.D = #D
+fun next.D(X) = X [D <- #D + 1]
+fun prev.D(X) = X [D <- #D - 1]
 fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
 fun wvr.D(X,Y) = X [D <- t]
   where
