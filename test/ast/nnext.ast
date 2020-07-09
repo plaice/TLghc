@@ -37,60 +37,60 @@ TLfile
   TLdeclVar "nextF5"
     TLapply TLvar "nnextF"
       TLconst TLint 5
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "next" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "next" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "nnext" [] ["N"]
+  TLdeclFunc "nnext" [] ["n"]
     TLwhere
-      TLdeclFunc "nexts" ["d"] ["x"]
+      TLdeclFunc "nexts" ["d"] ["X"]
         TLat
           "d"
           TLbinop TLbinPlus
             TLhash "d"
-            TLvar "N"
-          TLvar "x"
+            TLvar "n"
+          TLvar "X"
       TLvar "nexts"
-  TLdeclFunc "nnextF" [] ["N"]
+  TLdeclFunc "nnextF" [] ["n"]
     TLwhere
-      TLdeclDim "dN"
-        TLvar "N"
+      TLdeclDim "dn"
+        TLvar "n"
       TLdeclVar "nexts"
         TLapply TLvar "fby"
-          "dN"
+          "dn"
           TLfn
             ["d"]
-            ["x"]
-            TLvar "x"
+            ["X"]
+            TLvar "X"
           TLfn
             ["d"]
-            ["x"]
+            ["X"]
             TLapply TLvar "next"
               "d"
               TLapply TLvar "nexts"
                 "d"
-                TLvar "x"
+                TLvar "X"
       TLvar "nexts"
   TLevalExpr TLapply TLvar "index"
       "d"

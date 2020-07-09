@@ -1,7 +1,7 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclVar "z"
+  TLdeclVar "Z"
     TLapply TLvar "wvr"
       "d"
       TLapply TLvar "index"
@@ -9,53 +9,53 @@ TLfile
       TLapply TLvar "even"
         TLapply TLvar "index"
           "d"
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "next" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "next" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "wvr" ["D"] ["X","Y"]
+  TLdeclFunc "wvr" ["d"] ["X","Y"]
     TLwhere
-      TLdeclVar "t"
+      TLdeclVar "T"
         TLapply TLvar "fby"
-          "D"
-          TLvar "u"
+          "d"
+          TLvar "U"
           TLat
-            "D"
+            "d"
             TLbinop TLbinPlus
-              TLvar "t"
+              TLvar "T"
               TLconst TLint 1
-            TLvar "u"
-      TLdeclVar "u"
+            TLvar "U"
+      TLdeclVar "U"
         TLcond
           TLvar "Y"
-          TLhash "D"
+          TLhash "d"
           TLapply TLvar "next"
-            "D"
-            TLvar "u"
+            "d"
+            TLvar "U"
       TLat
-        "D"
-        TLvar "t"
+        "d"
+        TLvar "T"
         TLvar "X"
   TLdeclFunc "even" [] ["X"]
     TLbinop TLbinEQ
@@ -63,6 +63,6 @@ TLfile
         TLvar "X"
         TLconst TLint 2
       TLconst TLint 0
-  TLevalExpr TLvar "z"
+  TLevalExpr TLvar "Z"
     [("d",(0,7))]
 ========

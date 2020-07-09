@@ -1,8 +1,8 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
   TLevalExpr TLapply TLvar "index"
       "d"
     [("d",(-2,2))]

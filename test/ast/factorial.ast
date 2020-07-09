@@ -1,51 +1,51 @@
 TLfile
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "rParent" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "rParent" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
         TLbinop TLbinDiv
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 2
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "lChild" ["D"] ["X"]
+  TLdeclFunc "lChild" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinTimes
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 2
       TLvar "X"
-  TLdeclFunc "rChild" ["D"] ["X"]
+  TLdeclFunc "rChild" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
         TLbinop TLbinTimes
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 2
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "ilog" [] ["N"]
+  TLdeclFunc "ilog" [] ["n"]
     TLwhere
       TLdeclDim "d"
-        TLvar "N"
+        TLvar "n"
       TLdeclVar "il"
         TLapply TLvar "fby"
           "d"
@@ -59,22 +59,22 @@ TLfile
                 "d"
                 TLvar "il"
       TLvar "il"
-  TLdeclFunc "default" ["D"] ["N","X","Y"]
+  TLdeclFunc "default" ["d"] ["n","X","Y"]
     TLcond
       TLbinop TLbinOr
         TLbinop TLbinLT
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 1
         TLbinop TLbinGT
-          TLhash "D"
-          TLvar "N"
+          TLhash "d"
+          TLvar "n"
       TLvar "X"
       TLvar "Y"
-  TLdeclFunc "factorial" [] ["N"]
+  TLdeclFunc "factorial" [] ["n"]
     TLwhere
       TLdeclDim "d1"
         TLapply TLvar "ilog"
-          TLvar "N"
+          TLvar "n"
       TLdeclDim "d2"
         TLconst TLint 0
       TLdeclVar "f"
@@ -82,7 +82,7 @@ TLfile
           "d1"
           TLapply TLvar "default"
             "d2"
-            TLvar "N"
+            TLvar "n"
             TLconst TLint 1
             TLapply TLvar "index"
               "d2"

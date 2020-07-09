@@ -1,21 +1,21 @@
-fun index.D = #D
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun rotate.D1.D2(X) = X [ D1 <- #D2 ]
-fun sum.D(N,X) = y [ D <- N]
+fun index.d = #d
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun rotate.d1.d2(X) = X [ d1 <- #d2 ]
+fun sum.d(N,X) = Y [ d <- N]
 where
-  var y = 0 fby.D (X + y)
+  var Y = 0 fby.d (X + Y)
 end
-fun mm.Drow.Dcol(K,X,Y) = w
+fun mm.drow.dcol(k,X,Y) = W
 where
   dim d <- 0
-  var xp = rotate.Drow.d(X)
-  var yp = rotate.Dcol.d(Y)
-  var z = xp * yp
-  var w = sum.d(K,z)
+  var Xp = rotate.drow.d(X)
+  var Yp = rotate.dcol.d(Y)
+  var Z = Xp * Yp
+  var W = sum.d(k,Z)
 end
 dim drow <- 0
 dim dcol <- 0
-var x = index.drow + index.dcol
-evalExpr x @ [drow <- 0..2, dcol <- 0..2]
-evalExpr mm.drow.dcol(3,x,x) @ [drow <- 0..2, dcol <- 0..2]
+var X = index.drow + index.dcol
+evalExpr X @ [drow <- 0..2, dcol <- 0..2]
+evalExpr mm.drow.dcol(3,X,X) @ [drow <- 0..2, dcol <- 0..2]

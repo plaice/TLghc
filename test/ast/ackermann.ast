@@ -1,36 +1,36 @@
 TLfile
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "next" ["D"] ["X"]
+  TLdeclFunc "next" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "ackermann" [] ["M","N"]
+  TLdeclFunc "ackermann" [] ["m","n"]
     TLwhere
       TLdeclDim "dm"
-        TLvar "M"
+        TLvar "m"
       TLdeclDim "dn"
-        TLvar "N"
-      TLdeclVar "f"
+        TLvar "n"
+      TLdeclVar "F"
         TLapply TLvar "fby"
           "dm"
           TLapply TLvar "next"
@@ -41,14 +41,14 @@ TLfile
             "dn"
             TLapply TLvar "next"
               "dn"
-              TLvar "f"
+              TLvar "F"
             TLat
               "dn"
               TLapply TLvar "next"
                 "dm"
-                TLvar "f"
-              TLvar "f"
-      TLvar "f"
+                TLvar "F"
+              TLvar "F"
+      TLvar "F"
   TLevalExpr TLapply TLvar "ackermann"
       TLconst TLint 0
       TLconst TLint 0

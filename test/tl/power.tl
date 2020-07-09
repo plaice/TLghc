@@ -1,14 +1,14 @@
-fun lParent.D(X) = X [D <- #D / 2 ]
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun alt.D(X,Y) = if #D %2 == 0 then X else Y
-fun cby.D(X,Y) = if #D < 1 then X else Y
-fun power(N,X) = p
+fun lParent.d(X) = X [d <- #d / 2 ]
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun alt.d(X,Y) = if #d %2 == 0 then X else Y
+fun cby.d(X,Y) = if #d < 1 then X else Y
+fun power(n,X) = P
 where
-  dim d <- N
-  var p = 1 cby.d
-          ((lParent.d(p) * lParent.d(p)) alt.d
-           (X * prev.d(p)))
+  dim d <- n
+  var P = 1 cby.d
+          ((lParent.d(P) * lParent.d(P)) alt.d
+           (X * prev.d(P)))
 end
 evalExpr power(0,1) @ []
 evalExpr power(1,1) @ []

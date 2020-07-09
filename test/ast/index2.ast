@@ -3,10 +3,10 @@ TLfile
     TLconst TLint 0
   TLdeclDim "d2"
     TLconst TLint 0
-  TLdeclFunc "index2" ["D1","D2"] []
+  TLdeclFunc "index2" ["d1","d2"] []
     TLbinop TLbinPlus
-      TLhash "D1"
-      TLhash "D2"
+      TLhash "d1"
+      TLhash "d2"
   TLevalExpr TLapply TLvar "index2"
       "d1"
       "d2"

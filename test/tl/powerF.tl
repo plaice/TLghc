@@ -1,17 +1,17 @@
-fun lParent.D(X) = X [D <- #D / 2 ]
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun alt.D(X,Y) = if #D %2 == 0 then X else Y
-fun cby.D(X,Y) = if #D < 1 then X else Y
-fun powerF(N) = p
+fun lParent.d(X) = X [d <- #d / 2 ]
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun alt.d(X,Y) = if #d %2 == 0 then X else Y
+fun cby.d(X,Y) = if #d < 1 then X else Y
+fun powerF(n) = P
 where
-  dim d <- N
-  {- Parser still cannot parse prev.d(p)(x) -}
-  var p = (fn(x) -> 1) cby.d
-          ((fn(x) -> lp(x) * lp(x)) alt.d
-           (fn(x) -> x * pp(x)))
-  var lp = lParent.d(p)
-  var pp = prev.d(p)
+  dim d <- n
+  {- Parser still cannot parse prev.d(P)(X) -}
+  var P = (fn(X) -> 1) cby.d
+          ((fn(X) -> LP(X) * LP(X)) alt.d
+           (fn(X) -> X * PP(X)))
+  var LP = lParent.d(P)
+  var PP = prev.d(P)
 end
 var power0 = powerF(0)
 var power1 = powerF(1)

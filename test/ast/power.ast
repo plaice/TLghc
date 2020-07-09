@@ -1,48 +1,48 @@
 TLfile
-  TLdeclFunc "lParent" ["D"] ["X"]
+  TLdeclFunc "lParent" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinDiv
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 2
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "alt" ["D"] ["X","Y"]
+  TLdeclFunc "alt" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinEQ
         TLbinop TLbinMod
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 2
         TLconst TLint 0
       TLvar "X"
       TLvar "Y"
-  TLdeclFunc "cby" ["D"] ["X","Y"]
+  TLdeclFunc "cby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLvar "Y"
-  TLdeclFunc "power" [] ["N","X"]
+  TLdeclFunc "power" [] ["n","X"]
     TLwhere
       TLdeclDim "d"
-        TLvar "N"
-      TLdeclVar "p"
+        TLvar "n"
+      TLdeclVar "P"
         TLapply TLvar "cby"
           "d"
           TLconst TLint 1
@@ -51,16 +51,16 @@ TLfile
             TLbinop TLbinTimes
               TLapply TLvar "lParent"
                 "d"
-                TLvar "p"
+                TLvar "P"
               TLapply TLvar "lParent"
                 "d"
-                TLvar "p"
+                TLvar "P"
             TLbinop TLbinTimes
               TLvar "X"
               TLapply TLvar "prev"
                 "d"
-                TLvar "p"
-      TLvar "p"
+                TLvar "P"
+      TLvar "P"
   TLevalExpr TLapply TLvar "power"
       TLconst TLint 0
       TLconst TLint 1

@@ -1,4 +1,4 @@
-TLvar "z"
+TLvar "Z"
   d <- 0: TLint 0
        1: TLint 2
        2: TLint 4

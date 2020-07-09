@@ -1,5 +1,5 @@
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
 dim d <- 0
-var x = 0 fby.d x+1
-evalExpr x @ [d <- -2 .. 2]
+var X = 0 fby.d X+1
+evalExpr X @ [d <- -2 .. 2]

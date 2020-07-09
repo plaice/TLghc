@@ -1,20 +1,20 @@
-fun index.D = #D
-fun rParent.D(X) = X [D <- #D / 2 + 1]
-fun lChild.D(X) = X [D <- #D * 2]
-fun rChild.D(X) = X [D <- #D * 2 + 1]
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun ilog(N) = il
+fun index.d = #d
+fun rParent.d(X) = X [d <- #d / 2 + 1]
+fun lChild.d(X) = X [d <- #d * 2]
+fun rChild.d(X) = X [d <- #d * 2 + 1]
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun ilog(n) = il
 where
-  dim d <- N
+  dim d <- n
   var il = 0 fby.d (1 fby.d (1 + rParent.d(il)))
 end
-fun default.D(N,X,Y) = if #D < 1 || #D > N then X else Y
-fun factorial(N) = f
+fun default.d(n,X,Y) = if #d < 1 || #d > n then X else Y
+fun factorial(n) = f
 where
-  dim d1 <- ilog(N)
+  dim d1 <- ilog(n)
   dim d2 <- 0
-  var f = default.d2(N, 1, index.d2)
+  var f = default.d2(n, 1, index.d2)
           fby.d1 (lChild.d2(f) * rChild.d2(f))
 end
 evalExpr factorial(0) @ []

@@ -1,11 +1,11 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "first" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "first" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLconst TLint 0
       TLvar "X"
   TLevalExpr TLapply TLvar "first"

@@ -1,57 +1,57 @@
 TLfile
-  TLdeclFunc "lParent" ["D"] ["X"]
+  TLdeclFunc "lParent" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinDiv
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 2
       TLvar "X"
-  TLdeclFunc "rParent" ["D"] ["X"]
+  TLdeclFunc "rParent" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
         TLbinop TLbinDiv
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 2
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "alt" ["D"] ["X","Y"]
+  TLdeclFunc "alt" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinEQ
         TLbinop TLbinMod
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 2
         TLconst TLint 0
       TLvar "X"
       TLvar "Y"
-  TLdeclFunc "cby3" ["D"] ["X","Y"]
+  TLdeclFunc "cby3" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 3
       TLvar "X"
       TLvar "Y"
-  TLdeclFunc "fibonacci" [] ["N"]
+  TLdeclFunc "fibonacci" [] ["n"]
     TLwhere
       TLdeclDim "d"
-        TLvar "N"
-      TLdeclVar "f"
+        TLvar "n"
+      TLdeclVar "F"
         TLapply TLvar "cby3"
           "d"
           TLapply TLvar "fby"
@@ -63,32 +63,32 @@ TLfile
             TLbinop TLbinTimes
               TLapply TLvar "lParent"
                 "d"
-                TLvar "f"
+                TLvar "F"
               TLbinop TLbinMinus
                 TLbinop TLbinTimes
                   TLapply TLvar "rParent"
                     "d"
-                    TLvar "f"
+                    TLvar "F"
                   TLconst TLint 2
                 TLapply TLvar "lParent"
                   "d"
-                  TLvar "f"
+                  TLvar "F"
             TLbinop TLbinPlus
               TLbinop TLbinTimes
                 TLapply TLvar "lParent"
                   "d"
-                  TLvar "f"
+                  TLvar "F"
                 TLapply TLvar "lParent"
                   "d"
-                  TLvar "f"
+                  TLvar "F"
               TLbinop TLbinTimes
                 TLapply TLvar "rParent"
                   "d"
-                  TLvar "f"
+                  TLvar "F"
                 TLapply TLvar "rParent"
                   "d"
-                  TLvar "f"
-      TLvar "f"
+                  TLvar "F"
+      TLvar "F"
   TLevalExpr TLapply TLvar "fibonacci"
       TLconst TLint 0
     []

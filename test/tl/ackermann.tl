@@ -1,13 +1,13 @@
-fun index.D = #D
-fun prev.D(X) = X [D <- #D - 1]
-fun next.D(X) = X [D <- #D + 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun ackermann(M,N) = f
+fun index.d = #d
+fun prev.d(X) = X [d <- #d - 1]
+fun next.d(X) = X [d <- #d + 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun ackermann(m,n) = F
 where
-  dim dm <- M
-  dim dn <- N
-  var f = next.dn(index.dn) fby.dm
-          (next.dn(f) fby.dn (f [dn <- next.dm(f)]))
+  dim dm <- m
+  dim dn <- n
+  var F = next.dn(index.dn) fby.dm
+          (next.dn(F) fby.dn (F [dn <- next.dm(F)]))
 end
 evalExpr ackermann(0,0) @ []
 evalExpr ackermann(0,1) @ []

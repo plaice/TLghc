@@ -1,16 +1,16 @@
-fun index.D = #D
-fun next.D(X) = X [D <- #D + 1]
-fun prev.D(X) = X [D <- #D - 1]
-fun fby.D(X,Y) = if #D < 1 then X else prev.D(Y)
-fun nnext(N) = nexts
+fun index.d = #d
+fun next.d(X) = X [d <- #d + 1]
+fun prev.d(X) = X [d <- #d - 1]
+fun fby.d(X,Y) = if #d < 1 then X else prev.d(Y)
+fun nnext(n) = nexts
 where
-  fun nexts.d(x) = x [d <- #d + N]
+  fun nexts.d(X) = X [d <- #d + n]
 end
-fun nnextF(N) = nexts
+fun nnextF(n) = nexts
 where
-  dim dN <- N
-  var nexts = (fn.d(x) -> x) fby.dN
-              (fn.d(x) -> next.d(nexts.d(x)))
+  dim dn <- n
+  var nexts = (fn.d(X) -> X) fby.dn
+              (fn.d(X) -> next.d(nexts.d(X)))
 end
 dim d <- 0
 var next0 = nnext(0)

@@ -1,30 +1,30 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclVar "x"
+  TLdeclVar "X"
     TLapply TLvar "ybf"
       "d"
       TLbinop TLbinMinus
-        TLvar "x"
+        TLvar "X"
         TLconst TLint 1
       TLconst TLint 0
-  TLdeclFunc "next" ["D"] ["X"]
+  TLdeclFunc "next" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "ybf" ["D"] ["X","Y"]
+  TLdeclFunc "ybf" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinGT
-        TLhash "D"
+        TLhash "d"
         TLunop TLunNegate
           TLconst TLint 1
       TLvar "Y"
       TLapply TLvar "next"
-        "D"
+        "d"
         TLvar "X"
-  TLevalExpr TLvar "x"
+  TLevalExpr TLvar "X"
     [("d",(-2,2))]
 ========

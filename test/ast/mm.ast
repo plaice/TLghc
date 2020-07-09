@@ -3,79 +3,79 @@ TLfile
     TLconst TLint 0
   TLdeclDim "dcol"
     TLconst TLint 0
-  TLdeclVar "x"
+  TLdeclVar "X"
     TLbinop TLbinPlus
       TLapply TLvar "index"
         "drow"
       TLapply TLvar "index"
         "dcol"
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "rotate" ["D1","D2"] ["X"]
+  TLdeclFunc "rotate" ["d1","d2"] ["X"]
     TLat
-      "D1"
-      TLhash "D2"
+      "d1"
+      TLhash "d2"
       TLvar "X"
-  TLdeclFunc "sum" ["D"] ["N","X"]
+  TLdeclFunc "sum" ["d"] ["N","X"]
     TLwhere
-      TLdeclVar "y"
+      TLdeclVar "Y"
         TLapply TLvar "fby"
-          "D"
+          "d"
           TLconst TLint 0
           TLbinop TLbinPlus
             TLvar "X"
-            TLvar "y"
+            TLvar "Y"
       TLat
-        "D"
+        "d"
         TLvar "N"
-        TLvar "y"
-  TLdeclFunc "mm" ["Drow","Dcol"] ["K","X","Y"]
+        TLvar "Y"
+  TLdeclFunc "mm" ["drow","dcol"] ["k","X","Y"]
     TLwhere
       TLdeclDim "d"
         TLconst TLint 0
-      TLdeclVar "xp"
+      TLdeclVar "Xp"
         TLapply TLvar "rotate"
-          "Drow"
+          "drow"
           "d"
           TLvar "X"
-      TLdeclVar "yp"
+      TLdeclVar "Yp"
         TLapply TLvar "rotate"
-          "Dcol"
+          "dcol"
           "d"
           TLvar "Y"
-      TLdeclVar "z"
+      TLdeclVar "Z"
         TLbinop TLbinTimes
-          TLvar "xp"
-          TLvar "yp"
-      TLdeclVar "w"
+          TLvar "Xp"
+          TLvar "Yp"
+      TLdeclVar "W"
         TLapply TLvar "sum"
           "d"
-          TLvar "K"
-          TLvar "z"
-      TLvar "w"
-  TLevalExpr TLvar "x"
+          TLvar "k"
+          TLvar "Z"
+      TLvar "W"
+  TLevalExpr TLvar "X"
     [("drow",(0,2)),("dcol",(0,2))]
   TLevalExpr TLapply TLvar "mm"
       "drow"
       "dcol"
       TLconst TLint 3
-      TLvar "x"
-      TLvar "x"
+      TLvar "X"
+      TLvar "X"
     [("drow",(0,2)),("dcol",(0,2))]
 ========

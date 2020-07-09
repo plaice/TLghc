@@ -1,17 +1,17 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "default" ["D"] ["N","X","Y"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "default" ["d"] ["n","X","Y"]
     TLcond
       TLbinop TLbinOr
         TLbinop TLbinLT
-          TLhash "D"
+          TLhash "d"
           TLconst TLint 1
         TLbinop TLbinGT
-          TLhash "D"
-          TLvar "N"
+          TLhash "d"
+          TLvar "n"
       TLvar "X"
       TLvar "Y"
   TLevalExpr TLapply TLvar "default"

@@ -1,80 +1,80 @@
 TLfile
   TLdeclDim "d"
     TLconst TLint 0
-  TLdeclFunc "index" ["D"] []
-    TLhash "D"
-  TLdeclFunc "first" ["D"] ["X"]
+  TLdeclFunc "index" ["d"] []
+    TLhash "d"
+  TLdeclFunc "first" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLconst TLint 0
       TLvar "X"
-  TLdeclFunc "next" ["D"] ["X"]
+  TLdeclFunc "next" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinPlus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "prev" ["D"] ["X"]
+  TLdeclFunc "prev" ["d"] ["X"]
     TLat
-      "D"
+      "d"
       TLbinop TLbinMinus
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
-  TLdeclFunc "fby" ["D"] ["X","Y"]
+  TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
-        TLhash "D"
+        TLhash "d"
         TLconst TLint 1
       TLvar "X"
       TLapply TLvar "prev"
-        "D"
+        "d"
         TLvar "Y"
-  TLdeclFunc "wvr" ["D"] ["X","Y"]
+  TLdeclFunc "wvr" ["d"] ["X","Y"]
     TLwhere
-      TLdeclVar "t"
+      TLdeclVar "T"
         TLapply TLvar "fby"
-          "D"
-          TLvar "u"
+          "d"
+          TLvar "U"
           TLat
-            "D"
+            "d"
             TLbinop TLbinPlus
-              TLvar "t"
+              TLvar "T"
               TLconst TLint 1
-            TLvar "u"
-      TLdeclVar "u"
+            TLvar "U"
+      TLdeclVar "U"
         TLcond
           TLvar "Y"
-          TLhash "D"
+          TLhash "d"
           TLapply TLvar "next"
-            "D"
-            TLvar "u"
+            "d"
+            TLvar "U"
       TLat
-        "D"
-        TLvar "t"
+        "d"
+        TLvar "T"
         TLvar "X"
-  TLdeclFunc "primes" ["D"] []
+  TLdeclFunc "primes" ["d"] []
     TLwhere
       TLdeclDim "z"
         TLconst TLint 0
-      TLdeclVar "f"
+      TLdeclVar "F"
         TLapply TLvar "fby"
-          "D"
+          "d"
           TLbinop TLbinPlus
             TLhash "z"
             TLconst TLint 2
           TLapply TLvar "wvr"
             "z"
-            TLvar "f"
+            TLvar "F"
             TLbinop TLbinNE
               TLbinop TLbinMod
-                TLvar "f"
+                TLvar "F"
                 TLapply TLvar "first"
                   "z"
-                  TLvar "f"
+                  TLvar "F"
               TLconst TLint 0
-      TLvar "f"
+      TLvar "F"
   TLevalExpr TLapply TLvar "primes"
       "d"
     [("d",(0,7))]
