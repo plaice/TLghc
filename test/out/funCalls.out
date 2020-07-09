@@ -1,0 +1,58 @@
+TLapply (TLfn [] ["x"] (TLhash "d")) [] [TLconst TLint 1]
+  d <- -2: TLint -2
+       -1: TLint -1
+       0: TLint 0
+       1: TLint 1
+       2: TLint 2
+TLapply (TLfn [] ["x"] (TLbinop TLbinPlus (TLhash "d") (TLvar "x"))) [] [TLbinop TLbinPlus (TLhash "d") (TLhash "e")]
+  d <- -2, e <- -2: TLint -6
+                -1: TLint -5
+                0: TLint -4
+                1: TLint -3
+                2: TLint -2
+       -1, e <- -2: TLint -4
+                -1: TLint -3
+                0: TLint -2
+                1: TLint -1
+                2: TLint 0
+       0, e <- -2: TLint -2
+               -1: TLint -1
+               0: TLint 0
+               1: TLint 1
+               2: TLint 2
+       1, e <- -2: TLint 0
+               -1: TLint 1
+               0: TLint 2
+               1: TLint 3
+               2: TLint 4
+       2, e <- -2: TLint 2
+               -1: TLint 3
+               0: TLint 4
+               1: TLint 5
+               2: TLint 6
+TLapply (TLat [("d",TLconst TLint 3)] (TLfn [] ["x"] (TLbinop TLbinPlus (TLhash "d") (TLvar "x")))) [] [TLbinop TLbinPlus (TLhash "d") (TLhash "e")]
+  d <- -2, e <- -2: TLint -1
+                -1: TLint 0
+                0: TLint 1
+                1: TLint 2
+                2: TLint 3
+       -1, e <- -2: TLint 0
+                -1: TLint 1
+                0: TLint 2
+                1: TLint 3
+                2: TLint 4
+       0, e <- -2: TLint 1
+               -1: TLint 2
+               0: TLint 3
+               1: TLint 4
+               2: TLint 5
+       1, e <- -2: TLint 2
+               -1: TLint 3
+               0: TLint 4
+               1: TLint 5
+               2: TLint 6
+       2, e <- -2: TLint 3
+               -1: TLint 4
+               0: TLint 5
+               1: TLint 6
+               2: TLint 7
