@@ -63,6 +63,10 @@ parserDeclVar =
         m_reserved "var"
         chars <- manyTill anyChar (lookAhead parserAnyKeyWord)
         return (TLdeclVarError ("var " ++ chars))
+  <|> do
+        m_reserved "fun"
+        chars <- manyTill anyChar (lookAhead parserAnyKeyWord)
+        return (TLdeclFunError ("fun " ++ chars))
 
 parserDeclVarSimple :: Parser TLdecl
 parserDeclVarSimple =
@@ -581,3 +585,35 @@ processArray [(dim1, min1, max1),
         size3 = max3 - min3 + 1
         size4 = max4 - min4 + 1
         size5 = max5 - min5 + 1
+
+isDeclDim :: TLdecl -> Bool
+isDeclDim (TLdeclDim _ _) = True
+isDeclDim _               = False
+
+isDeclVar :: TLdecl -> Bool
+isDeclVar (TLdeclVar _ _) = True
+isDeclVar _               = False
+
+isDeclFunc :: TLdecl -> Bool
+isDeclFunc (TLdeclFunc _ _ _ _) = True
+isDeclFunc _                    = False
+
+isDeclDimError :: TLdecl -> Bool
+isDeclDimError (TLdeclDimError _) = True
+isDeclDimError _                  = False
+
+isDeclVarError :: TLdecl -> Bool
+isDeclVarError (TLdeclVarError _) = True
+isDeclVarError _                  = False
+
+isDeclFunError :: TLdecl -> Bool
+isDeclFunError (TLdeclFunError _) = True
+isDeclFunError _                  = False
+
+isEvalExpr :: TLeval -> Bool
+isEvalExpr (TLevalExpr _ _) = True
+isEvalExpr _                = False
+
+isEvalExprError :: TLeval -> Bool
+isEvalExprError (TLevalExprError _) = True
+isEvalExprError _                   = False
