@@ -34,10 +34,10 @@ data TLdata = TLbool Bool
             | TLfunc ([String] -> [TLexpr] -> TLenv -> TLctx -> TLdata)
 
 instance Show TLdata where
-  show (TLbool b) = "TLbool " ++ (show b)
-  show (TLchar c) = "TLchar " ++ (show c)
-  show (TLint i) = "TLint " ++ (show i)
-  show (TLstr s) = "TLstr " ++ (show s)
+  show (TLbool b) = "TLbool " ++ show b
+  show (TLchar c) = "TLchar " ++ show c
+  show (TLint i) = "TLint " ++ show i
+  show (TLstr s) = "TLstr " ++ show s
   show (TLfunc f) = "TLfunc"
 
 data TLuno = TLunNot
@@ -123,20 +123,20 @@ instance Show' TLexpr where
   show' a@(TLhash _) n = show a
   show' (TLat pairs expr) n =
     "TLat\n" ++
-    (concat $
-     map (\(dim,exp) ->
-          showN (n+2) ++ show dim ++ "\n" ++
-          showN (n+2) ++ show' exp (n+2) ++ "\n") pairs) ++
+    concatMap
+     (\(dim,exp) ->
+      showN (n+2) ++ show dim ++ "\n" ++
+      showN (n+2) ++ show' exp (n+2) ++ "\n") pairs ++
     showN (n+2) ++
     show' expr (n+2)
   show' a@(TLvar _) n = show a
   show' (TLwhere dims vars funcs expr) n =
     "TLwhere\n" ++
-    (concat $
-     (filter (\l -> not (null l))
-      [concat $ (map (\act -> show' act (n+2)) dims),
-       concat $ (map (\act -> show' act (n+2)) vars),
-       concat $ (map (\act -> show' act (n+2)) funcs)])) ++
+    concat
+     (filter (not . null)
+      [concatMap (\act -> show' act (n+2)) dims,
+       concatMap (\act -> show' act (n+2)) vars,
+       concatMap (\act -> show' act (n+2)) funcs]) ++
     showN (n+2) ++
     show' expr (n+2)
   show' (TLfn dimArgs varArgs expr) n =
@@ -149,10 +149,10 @@ instance Show' TLexpr where
      show' expr (n+2)
   show' (TLapply fnActual dimActuals exprActuals) n =
     "TLapply " ++ show fnActual ++ "\n" ++
-    (concat $ intersperse "\n"
-     (filter (\l -> not (null l))
-      [concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show act) dimActuals),
-       concat $ intersperse "\n" (map (\act -> showN (n+2) ++ show' act (n+2)) exprActuals)]))
+    intercalate "\n"
+     (filter (not . null)
+      [intercalate "\n" (map (\act -> showN (n+2) ++ show act) dimActuals),
+       intercalate "\n" (map (\act -> showN (n+2) ++ show' act (n+2)) exprActuals)])
 
 
 data TLenvEntry = TLdim Integer
@@ -219,13 +219,13 @@ data TLfile = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
 instance Show TLfile where
   show (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
     "TLfile\n" ++
-    (concat $ map (\dim -> show' dim 2) dims) ++
-    (concat $ map (\var -> show' var 2) vars) ++
-    (concat $ map (\func -> show' func 2) funcs) ++
-    (concat $ map (\evalExpr -> show' evalExpr 2) evalExprs) ++
-    (concat $ map (\err1 -> show' err1 2) errs1) ++
-    (concat $ map (\err2 -> show' err2 2) errs2) ++
-    (concat $ map (\err3 -> show' err3 2) errs3)
+    concatMap (`show'` 2) dims ++
+    concatMap (`show'` 2) vars ++
+    concatMap (`show'` 2) funcs ++
+    concatMap (`show'` 2) evalExprs ++
+    concatMap (`show'` 2) errs1 ++
+    concatMap (`show'` 2) errs2 ++
+    concatMap (`show'` 2) errs3
 
 isDeclDim (TLdeclDim _ _) = True
 isDeclDim _               = False
