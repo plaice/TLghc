@@ -1,5 +1,9 @@
 # Revision history for TLghc
 
+## 0.4.1.0 - 2020-07-11
+
+* New module TL.AST, hlint run on all files.
+
 ## 0.4.0.2 - 2020-07-09
 
 * Finish initial test suite, basic examples.
