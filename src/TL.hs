@@ -12,7 +12,7 @@ processText programText printAST parseOnly =
       Left err -> Left "Parse completely failed"
       Right ans ->
         do
-          let outAST = if printAST then (show ans) ++ "========\n" else ""
+          let outAST = if printAST then show ans ++ "========\n" else ""
           if not (checkFile ans)
           then Left (outAST ++ "Parse errors, cannot evaluate")
           else Right (outAST ++ (if not parseOnly then evalFile ans else ""))
