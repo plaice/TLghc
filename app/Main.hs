@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Applicative
 import System.IO
 import System.Environment
 import TL
@@ -22,4 +23,4 @@ readArgs ("--parseOnly" : args) = (False, True, args)
 readArgs args = (False, False, args)
 
 gather [] = getContents
-gather fs = fmap concat $ mapM readFile fs
+gather fs = concat Control.Applicative.<$> mapM readFile fs
