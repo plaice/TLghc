@@ -8,7 +8,7 @@ import Text.Parsec.Token
 import Text.Parsec.Language
 import qualified Data.Array as Array
 import qualified Data.Map as Map
-import TL.Eval
+import TL.AST
 import System.IO
 
 parseText programText = parse parserFile "" programText
