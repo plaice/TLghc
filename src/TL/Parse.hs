@@ -11,7 +11,7 @@ import qualified Data.Map as Map
 import TL.AST
 import System.IO
 
-parseText programText = parse parserFile "" programText
+parseText = parse parserFile ""
 
 parserFile :: Parser TLfile
 parserFile =
@@ -37,12 +37,8 @@ parserFileContents =
 
 parserDecl :: Parser TLdecl
 parserDecl =
-        do
-          decl <- parserDeclDim
-          return decl
-    <|> do
-          decl <- parserDeclVar
-          return decl
+        parserDeclDim
+    <|> parserDeclVar
 
 parserDeclDim :: Parser TLdecl
 parserDeclDim =
@@ -50,8 +46,7 @@ parserDeclDim =
          m_reserved "dim"
          d <- m_identifier
          m_reservedOp "<-"
-         expr <- parserExpr
-         return (TLdeclDim d expr)
+         TLdeclDim d <$> parserExpr
       )
   <|> do
         m_reserved "dim"
@@ -75,8 +70,7 @@ parserDeclVarSimple =
          m_reserved "var"
          x <- m_identifier
          m_reservedOp "="
-         expr <- parserExpr
-         return (TLdeclVar x expr)
+         TLdeclVar x <$> parserExpr
       )
 
 parserDeclVarDim :: Parser TLdecl
@@ -87,8 +81,7 @@ parserDeclVarDim =
          m_reservedOp "."
          dimArgs <- parserIdsDots
          m_reservedOp "="
-         expr <- parserExpr
-         return (TLdeclFunc x dimArgs [] expr)
+         TLdeclFunc x dimArgs [] <$> parserExpr
       )
 
 parserDeclVarInt :: Parser TLdecl
@@ -98,8 +91,7 @@ parserDeclVarInt =
          x <- m_identifier
          varArgs <- m_parens parserIds
          m_reservedOp "="
-         expr <- parserExpr
-         return (TLdeclFunc x [] varArgs expr)
+         TLdeclFunc x [] varArgs <$> parserExpr
       )
 
 parserDeclVarDimInt :: Parser TLdecl
@@ -111,8 +103,7 @@ parserDeclVarDimInt =
          dimArgs <- parserIdsDots
          varArgs <- m_parens parserIds
          m_reservedOp "="
-         expr <- parserExpr
-         return (TLdeclFunc x dimArgs varArgs expr)
+         TLdeclFunc x dimArgs varArgs <$> parserExpr
       )
 
 parserAnyKeyWord :: Parser ()
@@ -199,8 +190,7 @@ parserExprCondNo :: Parser TLexpr
 parserExprCondNo =
   try (do
          notFollowedBy (m_reserved "if")
-         arg <- parserExprOps
-         return arg
+         parserExprOps
       )
 
 parserExprCondYes :: Parser TLexpr
@@ -211,8 +201,7 @@ parserExprCondYes =
          m_reserved "then"
          arg2 <- parserExpr
          m_reserved "else"
-         arg3 <- parserExprCondMaybe
-         return (TLcond arg1 arg2 arg3)
+         TLcond arg1 arg2 <$> parserExprCondMaybe
       )
 
 parserExprOps :: Parser TLexpr
@@ -237,23 +226,23 @@ table = [ [ parserUnop  "!"  TLunNot
           ]
         , [ parserBinop "&&" TLbinAnd AssocLeft ]
         , [ parserBinop "||" TLbinOr AssocLeft ]
-        , [ parserTLop "fby"
-          , parserTLop "ybf"
+        , [ parserTLop "alt"
           , parserTLop "asa"
-          , parserTLop "wvr"
-          , parserTLop "upon"
-          , parserTLop "alt"
           , parserTLop "cby"
           , parserTLop "cby2"
           , parserTLop "cby3"
+          , parserTLop "fby"
+          , parserTLop "upon"
+          , parserTLop "wvr"
+          , parserTLop "ybf"
           ]
         ]
 
 parserUnop opToken opTL =
-  Prefix (m_reservedOp opToken >> return (\x -> TLunop opTL x))
+  Prefix (m_reservedOp opToken >> return (TLunop opTL))
 
-parserBinop opToken opTL assoc =
-  Infix (m_reservedOp opToken >> return (\x y -> TLbinop opTL x y)) assoc
+parserBinop opToken opTL =
+  Infix (m_reservedOp opToken >> return (TLbinop opTL))
 
 parserTLop token =
   Infix (parserTLopToken token) AssocLeft
@@ -392,25 +381,18 @@ parserExprParens =
 
 parserExprId :: Parser TLexpr
 parserExprId =
-  try (do
-         x <- m_identifier
-         return (TLvar x)
-      )
+  try (TLvar <$> m_identifier)
 
 parserExprHash :: Parser TLexpr
 parserExprHash =
   try (do
          m_reservedOp "#"
-         d <- m_identifier
-         return (TLhash d)
+         TLhash <$> m_identifier
       )
 
 parserExprData :: Parser TLexpr
 parserExprData =
-  try (do
-         datum <- parserData
-         return (TLconst datum)
-      )
+  try (TLconst <$> parserData)
 
 parserIds :: Parser [String]
 parserIds = m_commaSep m_identifier
@@ -449,17 +431,11 @@ parserDatas = m_commaSep parserData
 
 parserData :: Parser TLdata
 parserData =
-        (parserBool "true" True)
-    <|> (parserBool "false" False)
-    <|> do
-          c <- m_charLiteral
-          return (TLchar c)
-    <|> do
-          i <- m_integer
-          return (TLint i)
-    <|> do
-          s <- m_stringLiteral
-          return (TLstr s)
+        parserBool "true" True
+    <|> parserBool "false" False
+    <|> TLchar <$> m_charLiteral
+    <|> TLint <$> m_integer
+    <|> TLstr <$> m_stringLiteral
 
 parserBool opToken value =
   m_reserved opToken >> return (TLbool value)
@@ -506,7 +482,7 @@ processArray [(dim1, min1, max1)] datas
   | otherwise = TLarray1 dim1
                          (Array.array
                           (min1, max1)
-                          [(i, datas !! (fromInteger (i-min1))) |
+                          [(i, datas !! fromInteger (i-min1)) |
                            i <- [min1 .. max1]])
   where size1 = max1 - min1 + 1
 
@@ -519,7 +495,7 @@ processArray [(dim1, min1, max1),
                          (Array.array
                           ((min1, min2),
                            (max1, max2))
-                          [((i1,i2), datas !! (fromInteger d)) |
+                          [((i1,i2), datas !! fromInteger d) |
                            i1 <- [min1 .. max1],
                            i2 <- [min2 .. max2],
                            let d = (i2-min2) + size2 *
@@ -538,7 +514,7 @@ processArray [(dim1, min1, max1),
                          (Array.array
                           ((min1, min2, min3),
                            (max1, max2, max3))
-                          [((i1,i2,i3), datas !! (fromInteger d)) |
+                          [((i1,i2,i3), datas !! fromInteger d) |
                            i1 <- [min1 .. max1],
                            i2 <- [min2 .. max2],
                            i3 <- [min3 .. max3],
@@ -561,7 +537,7 @@ processArray [(dim1, min1, max1),
                          (Array.array
                           ((min1, min2, min3, min4),
                            (max1, max2, max3, max4))
-                          [((i1,i2,i3,i4), datas !! (fromInteger d)) |
+                          [((i1,i2,i3,i4), datas !! fromInteger d) |
                            i1 <- [min1 .. max1],
                            i2 <- [min2 .. max2],
                            i3 <- [min3 .. max3],
@@ -588,7 +564,7 @@ processArray [(dim1, min1, max1),
                          (Array.array
                           ((min1, min2, min3, min4, min5),
                            (max1, max2, max3, max4, max5))
-                          [((i1,i2,i3,i4,i5), datas !! (fromInteger d)) |
+                          [((i1,i2,i3,i4,i5), datas !! fromInteger d) |
                            i1 <- [min1 .. max1],
                            i2 <- [min2 .. max2],
                            i3 <- [min3 .. max3],
