@@ -29,11 +29,12 @@ parserFileContents =
     let funcs = filter isDeclFunc decls
     let dimErrors = filter isDeclDimError decls
     let valErrors = filter isDeclVarError decls
+    let funErrors = filter isDeclFunError decls
     evals <- many parserEvalExpr
     let evalExprs = filter isEvalExpr evals
     let evalErrors = filter isEvalExprError evals
     return (TLfile dims vars funcs evalExprs
-            dimErrors valErrors evalErrors)
+            dimErrors valErrors funErrors evalErrors)
 
 parserDecl :: Parser TLdecl
 parserDecl =

@@ -1,9 +1,18 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
 
+{- |
+Module      : TL.Eval
+Description : The module for evaluating TransLucid ASTs
+Copyright   : (c) John Plaice, 2020
+License     : GPL-3
+Maintainer  : johnplaice@gmail.com
+Stability   : experimental
+Portability : Portable
+-}
 module TL.Eval (
-   eval
+   checkFile
   ,evalFile
-  ,checkFile
+  ,eval
 )
 where
 
@@ -14,7 +23,14 @@ import Data.List
 import Data.Maybe
 import TL.AST
 
-evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
+-- | 'checkFile' examines a 'TLfile' for syntax errors
+checkFile :: TLfile -> Bool
+checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
+  null errs1 && null errs2 && null errs3 && null errs4
+
+-- | 'evalFile' evaluates the demands in an AST and generates output
+evalFile :: TLfile -> [Char]
+evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
   concatMap
    (\(TLevalExpr expr ctxRange) ->
     let expandedRanges = expandRange ctxRange in
@@ -31,6 +47,7 @@ evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
          (zip rangeTexts expandedRanges))
    evalExprs
 
+-- | 'eval' evaluates a TransLucid expression
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
 eval (TLhash d) env ctx = ctxLookup d env ctx
@@ -202,27 +219,54 @@ eval (TLbinop TLbinNE    arg1 arg2) env ctx =
     _                    -> error "TLbinop: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
+evalBinopBool
+  :: (Bool -> Bool -> Bool)
+     -> TLexpr
+     -> TLexpr
+     -> Map.Map String TLenvEntry
+     -> Map.Map Integer TLdata
+     -> TLdata
 evalBinopBool op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLbool b1, TLbool b2) -> TLbool (op b1 b2)
     _                      -> error "evalBinopBool: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
+evalBinopInt
+  :: (Integer -> Integer -> Integer)
+     -> TLexpr
+     -> TLexpr
+     -> Map.Map String TLenvEntry
+     -> Map.Map Integer TLdata
+     -> TLdata
 evalBinopInt op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLint (op i1 i2)
     _                    -> error "evalBinopInt: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
+evalBinopRel
+  :: (Integer -> Integer -> Bool)
+     -> TLexpr
+     -> TLexpr
+     -> Map.Map String TLenvEntry
+     -> Map.Map Integer TLdata
+     -> TLdata
 evalBinopRel op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLbool (op i1 i2)
     _                    -> error "evalBinopRel: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
 
+removeJust :: Maybe TLdata -> Integer
 removeJust (Just (TLint i)) = i
 
-
+ctxToAPI'
+  :: Ord k =>
+     Set.Set k
+     -> Map.Map k TLenvEntry
+     -> Map.Map Integer a
+     -> (Set.Set k, Map.Map k a)
 ctxToAPI' set0 env ctx =
   Map.foldlWithKey lookAtOne (set0, Map.fromList []) env
   where
@@ -238,24 +282,38 @@ ctxToAPI' set0 env ctx =
                       _ -> (set, m)
                     where val = Map.lookup key env
 
+ctxToAPI
+  :: Ord k =>
+     Map.Map k TLenvEntry -> Map.Map Integer a -> Map.Map k a
 ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
 
+ctxFromAPI'
+  :: Ord k =>
+     Map.Map k a
+     -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a, Integer)
 ctxFromAPI' ctx n =
   Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
   where
     lookAtOne (env', ctx', n') key ord =
       (Map.insert key (TLdim n') env', Map.insert n' ord ctx', n'+1)
 
+ctxFromAPI
+  :: Ord k =>
+     Map.Map k a -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a)
 ctxFromAPI ctx n = (env', ctx')
   where
     (env', ctx', n') = ctxFromAPI' ctx n
 
+ctxRank :: Map.Map Integer b -> Integer
 ctxRank = Map.foldlWithKey (\n k x -> max k n) 0
 
+ctxLookupOrd :: (Show k, Ord k) => k -> Map.Map k a -> a
 ctxLookupOrd loc ctx =
   fromMaybe (error $ "ctxLookupOrd: Did not find " ++ show loc) ord
   where ord = Map.lookup loc ctx
 
+ctxLookup
+  :: [Char] -> Map.Map [Char] TLenvEntry -> Map.Map Integer p -> p
 ctxLookup d env ctx =
   case dim of
     Just (TLdim loc) -> ctxLookupOrd loc ctx
@@ -263,39 +321,56 @@ ctxLookup d env ctx =
     _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
   where dim = Map.lookup d env
 
+ctxPerturbOne
+  :: [Char]
+     -> a
+     -> Map.Map [Char] TLenvEntry
+     -> Map.Map Integer a
+     -> Map.Map Integer a
 ctxPerturbOne d v env ctx =
   case dim of
     Just (TLdim loc) -> Map.insert loc v ctx
     Nothing -> error $ "ctxPerturbOne: Did not find " ++ d
   where dim = Map.lookup d env
 
+ctxPerturb
+  :: [([Char], a)]
+     -> Map.Map [Char] TLenvEntry
+     -> Map.Map Integer a
+     -> Map.Map Integer a
 ctxPerturb [] env ctx = ctx
 ctxPerturb ((d,v):subs) env ctx =
   ctxPerturbOne d v env $ ctxPerturb subs env ctx
 
+envLookup :: [Char] -> Map.Map [Char] a -> a
 envLookup x env =
   fromMaybe (error $ "envLookup: Did not find " ++ x) expr
   where expr = Map.lookup x env
 
+expandRange :: [(a, (Integer, Integer))] -> [[(a, TLexpr)]]
 expandRange [] = [[]]
 expandRange ((d,(min,max)):ranges) =
  [(d,TLconst (TLint i)):l | i <- [min..max], l <- expandRange ranges]
 
+getDims :: [(a1, (a2, b))] -> [(a1, TLdata)]
 getDims [] = []
 getDims ((d,(min,max)):ranges) =
  (d,TLint 0) : getDims ranges
 
+foldPairs :: [([Char], TLexpr)] -> [Char]
 foldPairs [] = ""
 foldPairs [(d,TLconst (TLint i))] =
   d ++ " <- " ++ show i
 foldPairs ((d,TLconst (TLint i)):l) =
   d ++ " <- " ++ show i ++ ", " ++ foldPairs l
 
+fixPrefixOne :: Char -> [Char] -> [Char]
 fixPrefixOne c [] = " "
 fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
 fixPrefixOne '-' (c:pairs) = '-':c:pairs
 fixPrefixOne _ (c:pairs) = ' ':c:pairs
 
+removePrefixOne :: [Char] -> [Char] -> [Char]
 removePrefixOne [] l = l
 removePrefixOne l [] = []
 removePrefixOne (c:pairs) (c':pairs')
@@ -303,12 +378,11 @@ removePrefixOne (c:pairs) (c':pairs')
               fixPrefixOne c newPairs
   | otherwise = c':pairs'
 
+removePrefix' :: [Char] -> [[Char]] -> [[Char]]
 removePrefix' pairs [] = []
 removePrefix' pairs (pairs':l) =
   removePrefixOne pairs pairs' : removePrefix' pairs' l
 
+removePrefix :: [[Char]] -> [[Char]]
 removePrefix [] = []
 removePrefix (pairs:l) = pairs : removePrefix' pairs l
-
-checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
-  null errs1 && null errs2 && null errs3

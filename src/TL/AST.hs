@@ -31,10 +31,10 @@ import Data.List
 -- | 'TLfile' is the AST for a TransLucid program.
 data TLfile
   = TLfile [TLdecl] [TLdecl] [TLdecl] [TLeval]
-           [TLdecl] [TLdecl] [TLeval]
+           [TLdecl] [TLdecl] [TLdecl] [TLeval]
 
 instance Show TLfile where
-  show (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
+  show (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
     "TLfile\n" ++
     concatMap (`showN` 2) dims ++
     concatMap (`showN` 2) vars ++
@@ -42,7 +42,8 @@ instance Show TLfile where
     concatMap (`showN` 2) evalExprs ++
     concatMap (`showN` 2) errs1 ++
     concatMap (`showN` 2) errs2 ++
-    concatMap (`showN` 2) errs3
+    concatMap (`showN` 2) errs3 ++
+    concatMap (`showN` 2) errs4
 
 -- | 'TLdecl' is the AST for a TransLucid declaration.
 data TLdecl
