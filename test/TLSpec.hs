@@ -29,7 +29,7 @@ testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")
   textAST <- readFile ("test/ast/" ++ func ++ ".ast")
   textOut <- readFile ("test/out/" ++ func ++ ".out")
-  hspec $ do
+  hspec $
     describe func $ do
       it ("tests the " ++ func ++ " function (parse)") $
         processText textTL False True `shouldBe` Right ""
