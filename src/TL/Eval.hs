@@ -11,23 +11,25 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Array as Array
 import Data.List
+import Data.Maybe
 import TL.AST
 
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
-  concat
-  (map (\(TLevalExpr expr ctxRange) ->
-        let expandedRanges = expandRange ctxRange in
-        let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-        let externDims = Map.fromList $ getDims ctxRange in
-        let (env,ctx) = ctxFromAPI externDims 0 in
-        (show expr) ++ "\n" ++ (concat
-        (map (\(text,pairs) ->
-              ("  " ++ (id text) ++ ": " ++
-               (show (eval (TLwhere dims vars funcs (TLat pairs expr))
-                           (Map.fromList []) (Map.fromList []))) ++
-               "\n"))
-            (zip rangeTexts expandedRanges))))
-       evalExprs)
+  concatMap
+   (\(TLevalExpr expr ctxRange) ->
+    let expandedRanges = expandRange ctxRange in
+    let rangeTexts = removePrefix (map foldPairs expandedRanges) in
+    let externDims = Map.fromList $ getDims ctxRange in
+    let (env,ctx) = ctxFromAPI externDims 0 in
+        show expr ++ "\n" ++
+        concatMap
+         (\(text,pairs) ->
+          "  " ++ text ++ ": " ++
+          show (eval (TLwhere dims vars funcs (TLat pairs expr))
+                     (Map.fromList []) (Map.fromList [])) ++
+          "\n")
+         (zip rangeTexts expandedRanges))
+   evalExprs
 
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
@@ -37,7 +39,7 @@ eval (TLat args arg) env ctx =
   where
     evalPair [] env ctx = []
     evalPair ((d,expr):args) env ctx =
-      (d, eval expr env ctx):(evalPair args env ctx)
+      (d, eval expr env ctx) : evalPair args env ctx
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
   eval expr
@@ -70,11 +72,11 @@ eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
     TLfunc funcLambda -> funcLambda dimActuals exprActuals env ctx
     _                 -> error "TLapply: Type error"
-  where funcEval = (eval func env ctx)
+  where funcEval = eval func env ctx
 
 eval (TLfn dimArgs varArgs expr) env ctx =
   TLfunc
-  (\dimActuals -> \exprActuals -> \envActuals -> \ctxActuals ->
+  (\dimActuals exprActuals envActuals ctxActuals ->
    let
      maxRank = max (ctxRank ctx) (ctxRank ctxActuals)
      dimPairs = zip dimArgs dimActuals
@@ -91,7 +93,7 @@ eval (TLfn dimArgs varArgs expr) env ctx =
                            (x, TLenvBinding dimPairs expr
                                envActuals ctxActuals))
                           varPairs)
-     env' = (Map.union (Map.union envDims envBindings) env)
+     env' = Map.union (Map.union envDims envBindings) env
    in eval expr env' ctx')
 
 eval (TLconst c) env ctx = c
@@ -231,7 +233,7 @@ ctxToAPI' set0 env ctx =
                         case ord of
                           Just j -> (Set.insert key set, Map.insert key j m)
                           Nothing -> error ("lookAtOne: Did not find " ++
-                                            (show i))
+                                            show i)
                         where ord = Map.lookup i ctx
                       _ -> (set, m)
                     where val = Map.lookup key env
@@ -248,12 +250,10 @@ ctxFromAPI ctx n = (env', ctx')
   where
     (env', ctx', n') = ctxFromAPI' ctx n
 
-ctxRank ctx = Map.foldlWithKey (\n k x -> max k n) 0 ctx
+ctxRank = Map.foldlWithKey (\n k x -> max k n) 0
 
 ctxLookupOrd loc ctx =
-  case ord of
-    Just v -> v
-    Nothing -> error $ "ctxLookupOrd: Did not find " ++ (show loc)
+  fromMaybe (error $ "ctxLookupOrd: Did not find " ++ show loc) ord
   where ord = Map.lookup loc ctx
 
 ctxLookup d env ctx =
@@ -274,9 +274,7 @@ ctxPerturb ((d,v):subs) env ctx =
   ctxPerturbOne d v env $ ctxPerturb subs env ctx
 
 envLookup x env =
-  case expr of
-    Just e -> e
-    Nothing -> error $ "envLookup: Did not find " ++ x
+  fromMaybe (error $ "envLookup: Did not find " ++ x) expr
   where expr = Map.lookup x env
 
 expandRange [] = [[]]
@@ -285,11 +283,13 @@ expandRange ((d,(min,max)):ranges) =
 
 getDims [] = []
 getDims ((d,(min,max)):ranges) =
- (d,TLint 0):(getDims ranges)
+ (d,TLint 0) : getDims ranges
 
 foldPairs [] = ""
-foldPairs ((d,TLconst (TLint i)):[]) = d ++ " <- " ++ (show i)
-foldPairs ((d,TLconst (TLint i)):l) = d ++ " <- " ++ (show i) ++ ", " ++ (foldPairs l)
+foldPairs [(d,TLconst (TLint i))] =
+  d ++ " <- " ++ show i
+foldPairs ((d,TLconst (TLint i)):l) =
+  d ++ " <- " ++ show i ++ ", " ++ foldPairs l
 
 fixPrefixOne c [] = " "
 fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
@@ -301,13 +301,14 @@ removePrefixOne l [] = []
 removePrefixOne (c:pairs) (c':pairs')
   | c == c' = let newPairs = removePrefixOne pairs pairs' in
               fixPrefixOne c newPairs
-  | otherwise = (c':pairs')
+  | otherwise = c':pairs'
 
 removePrefix' pairs [] = []
-removePrefix' pairs (pairs':l) = (removePrefixOne pairs pairs'):(removePrefix' pairs' l)
+removePrefix' pairs (pairs':l) =
+  removePrefixOne pairs pairs' : removePrefix' pairs' l
 
 removePrefix [] = []
-removePrefix (pairs:l) = pairs:(removePrefix' pairs l)
+removePrefix (pairs:l) = pairs : removePrefix' pairs l
 
 checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3) =
-  (length errs1 == 0) && (length errs2 == 0) && (length errs3 == 0)
+  null errs1 && null errs2 && null errs3
