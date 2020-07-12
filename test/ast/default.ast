@@ -1,6 +1,6 @@
 TLfile
   TLdeclDim "d"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclFunc "index" ["d"] []
     TLhash "d"
   TLdeclFunc "default" ["d"] ["n","X","Y"]
@@ -8,7 +8,7 @@ TLfile
       TLbinop TLbinOr
         TLbinop TLbinLT
           TLhash "d"
-          TLconst TLint 1
+          TLconst TLconstInt 1
         TLbinop TLbinGT
           TLhash "d"
           TLvar "n"
@@ -16,43 +16,43 @@ TLfile
       TLvar "Y"
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 0
-      TLconst TLint 1
+      TLconst TLconstInt 0
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,4))]
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 1
-      TLconst TLint 1
+      TLconst TLconstInt 1
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,4))]
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 2
-      TLconst TLint 1
+      TLconst TLconstInt 2
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,4))]
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 3
-      TLconst TLint 1
+      TLconst TLconstInt 3
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,4))]
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 4
-      TLconst TLint 1
+      TLconst TLconstInt 4
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,5))]
   TLevalExpr TLapply TLvar "default"
       "d"
-      TLconst TLint 5
-      TLconst TLint 1
+      TLconst TLconstInt 5
+      TLconst TLconstInt 1
       TLapply TLvar "index"
         "d"
     [("d",(0,6))]

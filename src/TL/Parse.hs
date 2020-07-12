@@ -431,19 +431,19 @@ parserRange =
          return (dim,min,max)
       )
 
-parserDatas :: Parser [TLdata]
+parserDatas :: Parser [TLconstData]
 parserDatas = m_commaSep parserData
 
-parserData :: Parser TLdata
+parserData :: Parser TLconstData
 parserData =
         parserBool "true" True
     <|> parserBool "false" False
-    <|> TLchar <$> m_charLiteral
-    <|> TLint <$> m_integer
-    <|> TLstr <$> m_stringLiteral
+    <|> TLconstChar <$> m_charLiteral
+    <|> TLconstInt <$> m_integer
+    <|> TLconstStr <$> m_stringLiteral
 
 parserBool opToken value =
-  m_reserved opToken >> return (TLbool value)
+  m_reserved opToken >> return (TLconstBool value)
 
 def = emptyDef{ commentStart = "{-"
               , commentEnd = "-}"

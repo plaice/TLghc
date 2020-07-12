@@ -8,7 +8,7 @@ TLvar "X"
           2, dcol <- 0: TLint 2
                      1: TLint 3
                      2: TLint 4
-TLapply (TLvar "mm") ["drow","dcol"] [TLconst TLint 3,TLvar "X",TLvar "X"]
+TLapply (TLvar "mm") ["drow","dcol"] [TLconst TLconstInt 3,TLvar "X",TLvar "X"]
   drow <- 0, dcol <- 0: TLint 5
                      1: TLint 8
                      2: TLint 11

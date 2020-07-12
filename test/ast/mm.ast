@@ -1,8 +1,8 @@
 TLfile
   TLdeclDim "drow"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclDim "dcol"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclVar "X"
     TLbinop TLbinPlus
       TLapply TLvar "index"
@@ -16,13 +16,13 @@ TLfile
       "d"
       TLbinop TLbinMinus
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
   TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
       TLapply TLvar "prev"
         "d"
@@ -37,7 +37,7 @@ TLfile
       TLdeclVar "Y"
         TLapply TLvar "fby"
           "d"
-          TLconst TLint 0
+          TLconst TLconstInt 0
           TLbinop TLbinPlus
             TLvar "X"
             TLvar "Y"
@@ -48,7 +48,7 @@ TLfile
   TLdeclFunc "mm" ["drow","dcol"] ["k","X","Y"]
     TLwhere
       TLdeclDim "d"
-        TLconst TLint 0
+        TLconst TLconstInt 0
       TLdeclVar "Xp"
         TLapply TLvar "rotate"
           "dcol"
@@ -74,7 +74,7 @@ TLfile
   TLevalExpr TLapply TLvar "mm"
       "drow"
       "dcol"
-      TLconst TLint 3
+      TLconst TLconstInt 3
       TLvar "X"
       TLvar "X"
     [("drow",(0,2)),("dcol",(0,2))]

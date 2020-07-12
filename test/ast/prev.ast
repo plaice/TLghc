@@ -1,6 +1,6 @@
 TLfile
   TLdeclDim "d"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclFunc "index" ["d"] []
     TLhash "d"
   TLdeclFunc "prev" ["d"] ["X"]
@@ -8,7 +8,7 @@ TLfile
       "d"
       TLbinop TLbinMinus
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
   TLevalExpr TLapply TLvar "prev"
       "d"

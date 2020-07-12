@@ -1,6 +1,6 @@
 TLfile
   TLdeclDim "d"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclFunc "index" ["d"] []
     TLhash "d"
   TLevalExpr TLapply TLvar "index"

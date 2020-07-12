@@ -13,13 +13,10 @@ module TL.AST (
    TLfile(..)
   ,TLdecl(..)
   ,TLexpr(..)
+  ,TLconstData(..)
   ,TLduo(..)
   ,TLuno(..)
-  ,TLdata(..)
-  ,TLenvEntry(..)
   ,TLeval(..)
-  ,TLctx
-  ,TLenv
 )
 where
 
@@ -94,36 +91,27 @@ instance ShowN TLdecl where
     "TLdeclFunError " ++ show err ++ "\n"
 
 -- | 'TLexpr' is the AST for a TransLucid expression.
-data TLexpr = TLconst TLdata
-            | TLarray1 String
-                       (Array.Array
-                        Integer
-                        TLdata)
-            | TLarray2 (String,String)
-                       (Array.Array
-                        (Integer,Integer)
-                        TLdata)
-            | TLarray3 (String,String,String)
-                       (Array.Array
-                        (Integer,Integer,Integer)
-                        TLdata)
-            | TLarray4 (String,String,String,String)
-                       (Array.Array
-                        (Integer,Integer,Integer,Integer)
-                        TLdata)
-            | TLarray5 (String,String,String,String,String)
-                       (Array.Array
-                        (Integer,Integer,Integer,Integer,Integer)
-                        TLdata)
-            | TLunop TLuno TLexpr
-            | TLbinop TLduo TLexpr TLexpr
-            | TLcond TLexpr TLexpr TLexpr
-            | TLhash String
-            | TLat [(String, TLexpr)] TLexpr
-            | TLvar String
-            | TLwhere [TLdecl] [TLdecl] [TLdecl] TLexpr
-            | TLfn [String] [String] TLexpr
-            | TLapply TLexpr [String] [TLexpr]
+data TLexpr
+  = TLconst TLconstData
+  | TLarray1 String
+             (Array.Array Integer TLconstData)
+  | TLarray2 (String,String)
+             (Array.Array (Integer,Integer) TLconstData)
+  | TLarray3 (String,String,String)
+             (Array.Array (Integer,Integer,Integer) TLconstData)
+  | TLarray4 (String,String,String,String)
+             (Array.Array (Integer,Integer,Integer,Integer) TLconstData)
+  | TLarray5 (String,String,String,String,String)
+             (Array.Array (Integer,Integer,Integer,Integer,Integer) TLconstData)
+  | TLunop TLuno TLexpr
+  | TLbinop TLduo TLexpr TLexpr
+  | TLcond TLexpr TLexpr TLexpr
+  | TLhash String
+  | TLat [(String, TLexpr)] TLexpr
+  | TLvar String
+  | TLwhere [TLdecl] [TLdecl] [TLdecl] TLexpr
+  | TLfn [String] [String] TLexpr
+  | TLapply TLexpr [String] [TLexpr]
   deriving Show
 
 instance ShowN TLexpr where
@@ -187,21 +175,18 @@ instance ShowN TLexpr where
        intercalate "\n"
          (map (\act -> indentN (n+2) ++ showN act (n+2)) exprActuals)])
 
--- | 'TLdata' is the AST for a TransLucid constant.
--- This is confusing AST constants and evaluated constants.
--- The two should be separated, and the second moved to Eval.hs
-data TLdata = TLbool Bool
-            | TLchar Char
-            | TLint Integer
-            | TLstr String
-            | TLfunc ([String] -> [TLexpr] -> TLenv -> TLctx -> TLdata)
+-- | 'TLconst' is the AST for a TransLucid constant.
+data TLconstData
+  = TLconstBool Bool
+  | TLconstChar Char
+  | TLconstInt Integer
+  | TLconstStr String
 
-instance Show TLdata where
-  show (TLbool b) = "TLbool " ++ show b
-  show (TLchar c) = "TLchar " ++ show c
-  show (TLint i) = "TLint " ++ show i
-  show (TLstr s) = "TLstr " ++ show s
-  show (TLfunc f) = "TLfunc"
+instance Show TLconstData where
+  show (TLconstBool b) = "TLconstBool " ++ show b
+  show (TLconstChar c) = "TLconstChar " ++ show c
+  show (TLconstInt i) = "TLconstInt " ++ show i
+  show (TLconstStr s) = "TLconstStr " ++ show s
 
 -- | 'TLduo' is the AST for a TransLucid binary operator.
 data TLduo = TLbinAnd
@@ -239,18 +224,3 @@ instance ShowN TLeval where
   showN (TLevalExprError err) n =
     indentN n ++
     "TLevalExprError " ++ show err ++ "\n"
-
--- | 'TLenvEntry' is an entry in the evaluation environment
--- This should be moved to Eval.hs
-data TLenvEntry = TLdim Integer
-                | TLenvExpr TLexpr
-                | TLenvBinding [(String,String)] TLexpr TLenv TLctx
-  deriving Show
-
--- | 'TLenv' is for the evaluation environment
--- This should be moved to Eval.hs
-type TLenv = Map.Map String TLenvEntry
-
--- | 'TLctx' is for the evaluation context
--- This should be moved to Eval.hs
-type TLctx = Map.Map Integer TLdata

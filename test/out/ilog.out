@@ -1,18 +1,18 @@
-TLapply (TLvar "ilog") [] [TLconst TLint 0]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 0]
   : TLint 0
-TLapply (TLvar "ilog") [] [TLconst TLint 1]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 1]
   : TLint 1
-TLapply (TLvar "ilog") [] [TLconst TLint 2]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 2]
   : TLint 2
-TLapply (TLvar "ilog") [] [TLconst TLint 3]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 3]
   : TLint 2
-TLapply (TLvar "ilog") [] [TLconst TLint 4]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 4]
   : TLint 3
-TLapply (TLvar "ilog") [] [TLconst TLint 5]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 5]
   : TLint 3
-TLapply (TLvar "ilog") [] [TLconst TLint 6]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 6]
   : TLint 3
-TLapply (TLvar "ilog") [] [TLconst TLint 7]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 7]
   : TLint 3
-TLapply (TLvar "ilog") [] [TLconst TLint 8]
+TLapply (TLvar "ilog") [] [TLconst TLconstInt 8]
   : TLint 4

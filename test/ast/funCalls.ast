@@ -1,17 +1,17 @@
 TLfile
   TLdeclDim "d"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclDim "e"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLevalExpr TLapply TLfn [] ["x"] (TLhash "d")
-      TLconst TLint 1
+      TLconst TLconstInt 1
     [("d",(-2,2))]
   TLevalExpr TLapply TLfn [] ["x"] (TLbinop TLbinPlus (TLhash "d") (TLvar "x"))
       TLbinop TLbinPlus
         TLhash "d"
         TLhash "e"
     [("d",(-2,2)),("e",(-2,2))]
-  TLevalExpr TLapply TLat [("d",TLconst TLint 3)] (TLfn [] ["x"] (TLbinop TLbinPlus (TLhash "d") (TLvar "x")))
+  TLevalExpr TLapply TLat [("d",TLconst TLconstInt 3)] (TLfn [] ["x"] (TLbinop TLbinPlus (TLhash "d") (TLvar "x")))
       TLbinop TLbinPlus
         TLhash "d"
         TLhash "e"

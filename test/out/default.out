@@ -1,35 +1,35 @@
-TLapply (TLvar "default") ["d"] [TLconst TLint 0,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 0,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 1
        3: TLint 1
        4: TLint 1
-TLapply (TLvar "default") ["d"] [TLconst TLint 1,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 1,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 1
        3: TLint 1
        4: TLint 1
-TLapply (TLvar "default") ["d"] [TLconst TLint 2,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 2,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 2
        3: TLint 1
        4: TLint 1
-TLapply (TLvar "default") ["d"] [TLconst TLint 3,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 3,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 2
        3: TLint 3
        4: TLint 1
-TLapply (TLvar "default") ["d"] [TLconst TLint 4,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 4,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 2
        3: TLint 3
        4: TLint 4
        5: TLint 1
-TLapply (TLvar "default") ["d"] [TLconst TLint 5,TLconst TLint 1,TLapply (TLvar "index") ["d"] []]
+TLapply (TLvar "default") ["d"] [TLconst TLconstInt 5,TLconst TLconstInt 1,TLapply (TLvar "index") ["d"] []]
   d <- 0: TLint 1
        1: TLint 1
        2: TLint 2

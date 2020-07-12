@@ -1,32 +1,32 @@
-TLapply (TLvar "ackermann") [] [TLconst TLint 0,TLconst TLint 0]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 0,TLconst TLconstInt 0]
   : TLint 1
-TLapply (TLvar "ackermann") [] [TLconst TLint 0,TLconst TLint 1]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 0,TLconst TLconstInt 1]
   : TLint 2
-TLapply (TLvar "ackermann") [] [TLconst TLint 0,TLconst TLint 2]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 0,TLconst TLconstInt 2]
   : TLint 3
-TLapply (TLvar "ackermann") [] [TLconst TLint 1,TLconst TLint 0]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 1,TLconst TLconstInt 0]
   : TLint 2
-TLapply (TLvar "ackermann") [] [TLconst TLint 1,TLconst TLint 1]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 1,TLconst TLconstInt 1]
   : TLint 3
-TLapply (TLvar "ackermann") [] [TLconst TLint 1,TLconst TLint 2]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 1,TLconst TLconstInt 2]
   : TLint 4
-TLapply (TLvar "ackermann") [] [TLconst TLint 1,TLconst TLint 3]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 1,TLconst TLconstInt 3]
   : TLint 5
-TLapply (TLvar "ackermann") [] [TLconst TLint 2,TLconst TLint 0]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 2,TLconst TLconstInt 0]
   : TLint 3
-TLapply (TLvar "ackermann") [] [TLconst TLint 2,TLconst TLint 1]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 2,TLconst TLconstInt 1]
   : TLint 5
-TLapply (TLvar "ackermann") [] [TLconst TLint 2,TLconst TLint 2]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 2,TLconst TLconstInt 2]
   : TLint 7
-TLapply (TLvar "ackermann") [] [TLconst TLint 2,TLconst TLint 3]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 2,TLconst TLconstInt 3]
   : TLint 9
-TLapply (TLvar "ackermann") [] [TLconst TLint 3,TLconst TLint 0]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 3,TLconst TLconstInt 0]
   : TLint 5
-TLapply (TLvar "ackermann") [] [TLconst TLint 3,TLconst TLint 1]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 3,TLconst TLconstInt 1]
   : TLint 13
-TLapply (TLvar "ackermann") [] [TLconst TLint 3,TLconst TLint 2]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 3,TLconst TLconstInt 2]
   : TLint 29
-TLapply (TLvar "ackermann") [] [TLconst TLint 3,TLconst TLint 3]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 3,TLconst TLconstInt 3]
   : TLint 61
-TLapply (TLvar "ackermann") [] [TLconst TLint 4,TLconst TLint 0]
+TLapply (TLvar "ackermann") [] [TLconst TLconstInt 4,TLconst TLconstInt 0]
   : TLint 13

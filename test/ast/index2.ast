@@ -1,8 +1,8 @@
 TLfile
   TLdeclDim "d1"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclDim "d2"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclFunc "index2" ["d1","d2"] []
     TLbinop TLbinPlus
       TLhash "d1"

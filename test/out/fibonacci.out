@@ -1,22 +1,22 @@
-TLapply (TLvar "fibonacci") [] [TLconst TLint 0]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 0]
   : TLint 0
-TLapply (TLvar "fibonacci") [] [TLconst TLint 1]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 1]
   : TLint 1
-TLapply (TLvar "fibonacci") [] [TLconst TLint 2]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 2]
   : TLint 1
-TLapply (TLvar "fibonacci") [] [TLconst TLint 3]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 3]
   : TLint 2
-TLapply (TLvar "fibonacci") [] [TLconst TLint 4]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 4]
   : TLint 3
-TLapply (TLvar "fibonacci") [] [TLconst TLint 5]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 5]
   : TLint 5
-TLapply (TLvar "fibonacci") [] [TLconst TLint 6]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 6]
   : TLint 8
-TLapply (TLvar "fibonacci") [] [TLconst TLint 7]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 7]
   : TLint 13
-TLapply (TLvar "fibonacci") [] [TLconst TLint 8]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 8]
   : TLint 21
-TLapply (TLvar "fibonacci") [] [TLconst TLint 100]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 100]
   : TLint 354224848179261915075
-TLapply (TLvar "fibonacci") [] [TLconst TLint 1000]
+TLapply (TLvar "fibonacci") [] [TLconst TLconstInt 1000]
   : TLint 43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875

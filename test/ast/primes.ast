@@ -1,32 +1,32 @@
 TLfile
   TLdeclDim "d"
-    TLconst TLint 0
+    TLconst TLconstInt 0
   TLdeclFunc "index" ["d"] []
     TLhash "d"
   TLdeclFunc "first" ["d"] ["X"]
     TLat
       "d"
-      TLconst TLint 0
+      TLconst TLconstInt 0
       TLvar "X"
   TLdeclFunc "next" ["d"] ["X"]
     TLat
       "d"
       TLbinop TLbinPlus
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
   TLdeclFunc "prev" ["d"] ["X"]
     TLat
       "d"
       TLbinop TLbinMinus
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
   TLdeclFunc "fby" ["d"] ["X","Y"]
     TLcond
       TLbinop TLbinLT
         TLhash "d"
-        TLconst TLint 1
+        TLconst TLconstInt 1
       TLvar "X"
       TLapply TLvar "prev"
         "d"
@@ -41,7 +41,7 @@ TLfile
             "d"
             TLbinop TLbinPlus
               TLvar "T"
-              TLconst TLint 1
+              TLconst TLconstInt 1
             TLvar "U"
       TLdeclVar "U"
         TLcond
@@ -57,13 +57,13 @@ TLfile
   TLdeclFunc "primes" ["d"] []
     TLwhere
       TLdeclDim "z"
-        TLconst TLint 0
+        TLconst TLconstInt 0
       TLdeclVar "F"
         TLapply TLvar "fby"
           "d"
           TLbinop TLbinPlus
             TLhash "z"
-            TLconst TLint 2
+            TLconst TLconstInt 2
           TLapply TLvar "wvr"
             "z"
             TLvar "F"
@@ -73,7 +73,7 @@ TLfile
                 TLapply TLvar "first"
                   "z"
                   TLvar "F"
-              TLconst TLint 0
+              TLconst TLconstInt 0
       TLvar "F"
   TLevalExpr TLapply TLvar "primes"
       "d"
