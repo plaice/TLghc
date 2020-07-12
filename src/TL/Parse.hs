@@ -1,16 +1,19 @@
 module TL.Parse (parseText)
 where
 
+import Data.Functor.Identity
 import Text.Parsec
-import Text.Parsec.String
+import Text.Parsec.Error
 import Text.Parsec.Expr
-import Text.Parsec.Token
 import Text.Parsec.Language
+import Text.Parsec.String
+import Text.Parsec.Token
 import qualified Data.Array as Array
 import qualified Data.Map as Map
 import TL.AST
 import System.IO
 
+parseText :: String -> Either ParseError TLfile
 parseText = parse parserFile ""
 
 parserFile :: Parser TLfile
@@ -211,6 +214,7 @@ parserExprCondYes =
 
 parserExprOps :: Parser TLexpr
 parserExprOps = buildExpressionParser table term <?> "expression"
+term = parserExprApplyMaybe
 table = [ [ parserUnop  "!"  TLunNot
           , parserUnop  "-"  TLunNegate
           ]
@@ -243,23 +247,32 @@ table = [ [ parserUnop  "!"  TLunNot
           ]
         ]
 
+parserUnop
+  :: String
+     -> TLuno -> Operator String u Data.Functor.Identity.Identity TLexpr
 parserUnop opToken opTL =
   Prefix (m_reservedOp opToken >> return (TLunop opTL))
 
+parserBinop
+  :: String
+     -> TLduo
+     -> Assoc
+     -> Operator String u Data.Functor.Identity.Identity TLexpr
 parserBinop opToken opTL =
   Infix (m_reservedOp opToken >> return (TLbinop opTL))
 
 parserTLop token =
   Infix (parserTLopToken token) AssocLeft
 
+parserTLop
+  :: String
+     -> Operator String u Data.Functor.Identity.Identity TLexpr
 parserTLopToken token =
   do
     m_reserved token
     m_reservedOp "."
     d <- m_identifier
     return (\x y -> TLapply (TLvar token) [d] [x,y])
-
-term = parserExprApplyMaybe
 
 parserExprApplyMaybe :: Parser TLexpr
 parserExprApplyMaybe = parserExprApplyNo
@@ -479,6 +492,9 @@ TokenParser{ parens = m_parens
            , stringLiteral = m_stringLiteral
            , whiteSpace = m_whiteSpace
            } = makeTokenParser def
+
+processArray
+  :: [(String, Integer, Integer)] -> [TLconstData] -> TLexpr
 
 processArray [(dim1, min1, max1)] datas
   | (toInteger . length $ datas) /=

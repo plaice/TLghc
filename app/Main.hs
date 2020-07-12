@@ -23,4 +23,4 @@ readArgs ("--parseOnly" : args) = (False, True, args)
 readArgs args = (False, False, args)
 
 gather [] = getContents
-gather fs = concat Control.Applicative.<$> mapM readFile fs
+gather fs = concat <$> mapM readFile fs
