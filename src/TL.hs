@@ -19,7 +19,7 @@ import TL.Parse
 -- * 'programText' is the text of the program.
 -- * 'printAST', if True, prints out the resulting AST.
 -- * 'parseOnly', if True, only parses the input.
-processText :: [Char] -> Bool -> Bool -> Either [Char] [Char]
+processText :: String -> Bool -> Bool -> Either String String
 processText programText printAST parseOnly =
   do
     let parsedText = parseText programText

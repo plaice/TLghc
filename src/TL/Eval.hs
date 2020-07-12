@@ -49,13 +49,14 @@ type TLenv = Map.Map String TLenvEntry
 -- | 'TLctx' is for the evaluation context
 type TLctx = Map.Map Integer TLdata
 
+
 -- | 'checkFile' examines a 'TLfile' for syntax errors
 checkFile :: TLfile -> Bool
 checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
   null errs1 && null errs2 && null errs3 && null errs4
 
 -- | 'evalFile' evaluates the demands in an AST and generates output
-evalFile :: TLfile -> [Char]
+evalFile :: TLfile -> String
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
   concatMap
    (\(TLevalExpr expr ctxRange) ->
@@ -342,7 +343,7 @@ ctxLookupOrd loc ctx =
   where ord = Map.lookup loc ctx
 
 ctxLookup
-  :: [Char] -> Map.Map [Char] TLenvEntry -> Map.Map Integer p -> p
+  :: String -> Map.Map String TLenvEntry -> Map.Map Integer p -> p
 ctxLookup d env ctx =
   case dim of
     Just (TLdim loc) -> ctxLookupOrd loc ctx
@@ -351,9 +352,9 @@ ctxLookup d env ctx =
   where dim = Map.lookup d env
 
 ctxPerturbOne
-  :: [Char]
+  :: String
      -> a
-     -> Map.Map [Char] TLenvEntry
+     -> Map.Map String TLenvEntry
      -> Map.Map Integer a
      -> Map.Map Integer a
 ctxPerturbOne d v env ctx =
@@ -363,15 +364,15 @@ ctxPerturbOne d v env ctx =
   where dim = Map.lookup d env
 
 ctxPerturb
-  :: [([Char], a)]
-     -> Map.Map [Char] TLenvEntry
+  :: [(String, a)]
+     -> Map.Map String TLenvEntry
      -> Map.Map Integer a
      -> Map.Map Integer a
 ctxPerturb [] env ctx = ctx
 ctxPerturb ((d,v):subs) env ctx =
   ctxPerturbOne d v env $ ctxPerturb subs env ctx
 
-envLookup :: [Char] -> Map.Map [Char] a -> a
+envLookup :: String -> Map.Map String a -> a
 envLookup x env =
   fromMaybe (error $ "envLookup: Did not find " ++ x) expr
   where expr = Map.lookup x env
@@ -386,20 +387,20 @@ getDims [] = []
 getDims ((d,(min,max)):ranges) =
  (d,TLint 0) : getDims ranges
 
-foldPairs :: [([Char], TLexpr)] -> [Char]
+foldPairs :: [(String, TLexpr)] -> String
 foldPairs [] = ""
 foldPairs [(d,TLconst (TLconstInt i))] =
   d ++ " <- " ++ show i
 foldPairs ((d,TLconst (TLconstInt i)):l) =
   d ++ " <- " ++ show i ++ ", " ++ foldPairs l
 
-fixPrefixOne :: Char -> [Char] -> [Char]
+fixPrefixOne :: Char -> String -> String
 fixPrefixOne c [] = " "
 fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
 fixPrefixOne '-' (c:pairs) = '-':c:pairs
 fixPrefixOne _ (c:pairs) = ' ':c:pairs
 
-removePrefixOne :: [Char] -> [Char] -> [Char]
+removePrefixOne :: String -> String -> String
 removePrefixOne [] l = l
 removePrefixOne l [] = []
 removePrefixOne (c:pairs) (c':pairs')
@@ -407,11 +408,11 @@ removePrefixOne (c:pairs) (c':pairs')
               fixPrefixOne c newPairs
   | otherwise = c':pairs'
 
-removePrefix' :: [Char] -> [[Char]] -> [[Char]]
+removePrefix' :: String -> [String] -> [String]
 removePrefix' pairs [] = []
 removePrefix' pairs (pairs':l) =
   removePrefixOne pairs pairs' : removePrefix' pairs' l
 
-removePrefix :: [[Char]] -> [[Char]]
+removePrefix :: [String] -> [String]
 removePrefix [] = []
 removePrefix (pairs:l) = pairs : removePrefix' pairs l
