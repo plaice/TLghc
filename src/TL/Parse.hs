@@ -1,3 +1,12 @@
+{- |
+Module      : TL.Parse
+Description : The module for parsing TransLucid programs
+Copyright   : (c) John Plaice, 2020
+License     : GPL-3
+Maintainer  : johnplaice@gmail.com
+Stability   : experimental
+Portability : Portable
+-}
 module TL.Parse (parseText)
 where
 

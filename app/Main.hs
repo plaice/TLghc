@@ -1,3 +1,12 @@
+{- |
+Module      : Main
+Description : The Main module for TLghc
+Copyright   : (c) John Plaice, 2020
+License     : GPL-3
+Maintainer  : johnplaice@gmail.com
+Stability   : experimental
+Portability : Portable
+-}
 module Main where
 
 import Control.Applicative

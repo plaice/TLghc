@@ -1,3 +1,14 @@
+{- |
+Module      : Main
+Description : Top-level file for testing TLghc
+Copyright   : (c) John Plaice, 2020
+License     : GPL-3
+Maintainer  : johnplaice@gmail.com
+Stability   : experimental
+Portability : Portable
+-}
+module Main where
+
 import Test.Hspec
 import System.IO
 import TL
