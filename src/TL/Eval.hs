@@ -135,7 +135,7 @@ eval (TLfn dimArgs varArgs expr) env ctx =
             (map (\((d,delta),rk) ->
                   (rk, ctxLookupOrd delta ctxActuals))
             dimTriples)
-     ctx' = Map.union ctxDims ctx
+     ctxNew = Map.union ctxDims ctx
      envDims =
          Map.fromList
             (map (\((d,delta),rk) -> (d, TLdim rk)) dimTriples)
@@ -150,8 +150,8 @@ eval (TLfn dimArgs varArgs expr) env ctx =
                                  (delta, ctxLookupOrd rk k)) dimTriples))
                           ctxActuals))))
                    varPairs)
-     env' = Map.union (Map.union envDims envBindings) env
-   in eval expr env' ctx')
+     envNew = Map.union (Map.union envDims envBindings) env
+   in eval expr envNew ctxNew)
 
 eval (TLconst (TLconstBool b)) env ctx = TLbool b
 eval (TLconst (TLconstChar c)) env ctx = TLchar c
