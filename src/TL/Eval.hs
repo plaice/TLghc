@@ -28,7 +28,7 @@ data TLdata = TLbool Bool
             | TLchar Char
             | TLint Integer
             | TLstr String
-            | TLfunc ([String] -> [TLexpr] -> TLenv -> TLctx -> TLdata)
+            | TLfunc ([Integer] -> [TLctx -> TLdata] -> TLctx -> TLdata)
 
 instance Show TLdata where
   show (TLbool b) = "TLbool " ++ show b
@@ -39,8 +39,7 @@ instance Show TLdata where
 
 -- | 'TLenvEntry' is an entry in the evaluation environment
 data TLenvEntry = TLdim Integer
-                | TLenvExpr TLexpr
-                | TLenvBinding [(String,String)] TLexpr TLenv TLctx
+                | TLintension (TLctx -> TLdata)
 --  deriving Show
 
 -- | 'TLenv' is for the evaluation environment
@@ -86,57 +85,71 @@ eval (TLat args arg) env ctx =
       (d, eval expr env ctx) : evalPair args env ctx
 
 eval (TLwhere dimDecls varDecls funcDecls expr) env ctx =
-  eval expr
-       (Map.union (Map.union envDims (Map.union envVars envFuncs)) env)
-       (Map.union ctxDims ctx)
+  eval expr envNew ctxNew
   where
     triples  = zip dimDecls [1 + ctxRank ctx ..]
     envDims  = Map.fromList
-                 (map (\(TLdeclDim d expr,rk) -> (d, TLdim rk)) triples)
+                 (map (\(TLdeclDim d expr,rk) ->
+                       (d, TLdim rk))
+                      triples)
     envVars  = Map.fromList
-                 (map (\(TLdeclVar x expr) -> (x, TLenvExpr expr)) varDecls)
+                 (map (\(TLdeclVar x expr) ->
+                       (x, TLintension (eval expr envNew)))
+                      varDecls)
     envFuncs = Map.fromList
                  (map (\(TLdeclFunc f dims vars expr) ->
-                      (f, TLenvExpr (TLfn dims vars expr))) funcDecls)
+                       (f, TLintension (eval (TLfn dims vars expr) envNew)))
+                      funcDecls)
     ctxDims  = Map.fromList
-                 (map (\(TLdeclDim d expr,rk) -> (rk, eval expr env ctx))
+                 (map (\(TLdeclDim d expr,rk) ->
+                       (rk, eval expr env ctx))
                       triples)
+    envNew   = Map.union (Map.union envDims (Map.union envVars envFuncs)) env
+    ctxNew   = Map.union ctxDims ctx
 
 eval (TLvar x) env ctx =
   case envEntry of
     TLdim loc -> error $ "TLvar: Dimension used as variable: " ++ x
-    TLenvExpr expr -> eval expr env ctx
-    TLenvBinding dimPairs expr envBind ctxBind ->
-      eval expr envBind
-           (ctxPerturb (map (\(d,d') -> (d', eval (TLhash d) env ctx)) dimPairs)
-                       envBind ctxBind)
+    TLintension intense -> intense ctx
   where envEntry = envLookup x env
 
 eval (TLapply func dimActuals exprActuals) env ctx =
   case funcEval of
-    TLfunc funcLambda -> funcLambda dimActuals exprActuals env ctx
-    _                 -> error "TLapply: Type error"
+    TLfunc funcLambda
+        -> funcLambda (map (`getLoc` env) dimActuals)
+                      (map (`eval` env) exprActuals)
+                      ctx
+    _   -> error "TLapply: Type error"
   where funcEval = eval func env ctx
 
 eval (TLfn dimArgs varArgs expr) env ctx =
   TLfunc
-  (\dimActuals exprActuals envActuals ctxActuals ->
+  (\dimActuals intenseActuals ctxActuals ->
    let
      maxRank = max (ctxRank ctx) (ctxRank ctxActuals)
      dimPairs = zip dimArgs dimActuals
      dimTriples = zip dimPairs [1 + maxRank ..]
-     varPairs = zip varArgs exprActuals
-     ctxDims = Map.fromList
-                 (map (\((d,d'),rk) ->
-                      (rk, ctxLookup d' envActuals ctxActuals)) dimTriples)
+     varPairs = zip varArgs intenseActuals
+     ctxDims =
+         Map.fromList
+            (map (\((d,delta),rk) ->
+                  (rk, ctxLookupOrd delta ctxActuals))
+            dimTriples)
      ctx' = Map.union ctxDims ctx
-     envDims = Map.fromList
-                 (map (\((d,d'),rk) -> (d, TLdim rk)) dimTriples)
-     envBindings = Map.fromList
-                     (map (\(x,expr) ->
-                           (x, TLenvBinding dimPairs expr
-                               envActuals ctxActuals))
-                          varPairs)
+     envDims =
+         Map.fromList
+            (map (\((d,delta),rk) -> (d, TLdim rk)) dimTriples)
+     envBindings
+         = Map.fromList
+              (map (\(x,intense) ->
+                    (x, TLintension
+                        (\k -> intense
+                         (Map.union
+                          (Map.fromList
+                           (map (\((d,delta),rk) ->
+                                 (delta, ctxLookupOrd rk k)) dimTriples))
+                          ctxActuals))))
+                   varPairs)
      env' = Map.union (Map.union envDims envBindings) env
    in eval expr env' ctx')
 
@@ -287,6 +300,14 @@ evalBinopRel op arg1 arg2 env ctx =
     (TLint i1, TLint i2) -> TLbool (op i1 i2)
     _                    -> error "evalBinopRel: Type error"
   where (val1, val2) = (eval arg1 env ctx, eval arg2 env ctx)
+
+getLoc :: String -> Map.Map String TLenvEntry -> Integer
+getLoc d env =
+  case dim of
+    Just (TLdim loc) -> loc
+    Nothing -> error $ "getLoc: Did not find " ++ d
+    _ -> error $ "getLoc: " ++ d ++ " is not a dimension identifier"
+  where dim = Map.lookup d env
 
 removeJust :: Maybe TLdata -> Integer
 removeJust (Just (TLint i)) = i
