@@ -48,6 +48,12 @@ type TLenv = Map.Map String TLenvEntry
 -- | 'TLctx' is for the evaluation context.
 type TLctx = Map.Map Integer TLdata
 
+-- | 'TLextCtx' is for the external context.
+type TLextCtx = Map.Map String TLdata
+
+-- | 'TLlistCtx' is for the evaluation context.
+type TLlistCtx = Map.Map String Integer
+
 -- | 'eval' evaluates a TransLucid expression.
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
 
@@ -240,11 +246,7 @@ eval (TLbinop TLbinNE    arg1 arg2) env ctx =
 -- | 'evalBinopBool': Boolean binary operator (|| or &&).
 evalBinopBool
   :: (Bool -> Bool -> Bool)
-     -> TLexpr
-     -> TLexpr
-     -> Map.Map String TLenvEntry
-     -> Map.Map Integer TLdata
-     -> TLdata
+     -> TLexpr -> TLexpr -> TLenv -> TLctx -> TLdata
 evalBinopBool op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLbool b1, TLbool b2) -> TLbool (op b1 b2)
@@ -254,11 +256,7 @@ evalBinopBool op arg1 arg2 env ctx =
 -- | 'evalBinopInt': integer binary operator (+, -, *, div, mod, rem).
 evalBinopInt
   :: (Integer -> Integer -> Integer)
-     -> TLexpr
-     -> TLexpr
-     -> Map.Map String TLenvEntry
-     -> Map.Map Integer TLdata
-     -> TLdata
+     -> TLexpr -> TLexpr -> TLenv -> TLctx -> TLdata
 evalBinopInt op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLint (op i1 i2)
@@ -268,11 +266,7 @@ evalBinopInt op arg1 arg2 env ctx =
 -- | 'evalBinopRel': relational binary operator (<, <=, ==, /=, >=, >).
 evalBinopRel
   :: (Integer -> Integer -> Bool)
-     -> TLexpr
-     -> TLexpr
-     -> Map.Map String TLenvEntry
-     -> Map.Map Integer TLdata
-     -> TLdata
+     -> TLexpr -> TLexpr -> TLenv -> TLctx -> TLdata
 evalBinopRel op arg1 arg2 env ctx =
   case (val1, val2) of
     (TLint i1, TLint i2) -> TLbool (op i1 i2)
@@ -282,16 +276,14 @@ evalBinopRel op arg1 arg2 env ctx =
 -- Utility routines needed for 'evalFile' and 'eval' of arrays.
 
 ctxToAPI
-  :: Ord k =>
-     Map.Map k TLenvEntry -> Map.Map Integer a -> Map.Map k a
+  :: TLenv -> TLctx -> TLextCtx
 ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
 
 ctxToAPI'
-  :: Ord k =>
-     Set.Set k
-     -> Map.Map k TLenvEntry
-     -> Map.Map Integer a
-     -> (Set.Set k, Map.Map k a)
+  :: Set.Set String
+     -> TLenv
+     -> TLctx
+     -> (Set.Set String, TLextCtx)
 ctxToAPI' set0 env ctx =
   Map.foldlWithKey lookAtOne (set0, Map.fromList []) env
   where
@@ -309,21 +301,22 @@ ctxToAPI' set0 env ctx =
 
 
 ctxFromAPI
-  :: Ord k =>
-     Map.Map k a -> (Map.Map k TLenvEntry, Map.Map Integer a)
+  :: TLlistCtx
+     -> (TLenv, Map.Map Integer Integer)
 ctxFromAPI ctx = ctxFromAPI' ctx 0
 
 ctxFromAPI'
-  :: Ord k =>
-     Map.Map k a -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a)
+  :: TLlistCtx
+     -> Integer
+     -> (TLenv, Map.Map Integer Integer)
 ctxFromAPI' ctx n = (env', ctx')
   where
     (env', ctx', n') = ctxFromAPI'' ctx n
 
 ctxFromAPI''
-  :: Ord k =>
-     Map.Map k a
-     -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a, Integer)
+  :: TLlistCtx
+     -> Integer
+     -> (TLenv, Map.Map Integer Integer, Integer)
 ctxFromAPI'' ctx n =
   Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
   where
@@ -332,7 +325,7 @@ ctxFromAPI'' ctx n =
 
 -- Utility routines needed for 'eval'.
 
-getLoc :: String -> Map.Map String TLenvEntry -> Integer
+getLoc :: String -> TLenv -> Integer
 getLoc d env =
   case dim of
     Just (TLdim loc) -> loc
@@ -351,8 +344,7 @@ ctxLookupOrd loc ctx =
   fromMaybe (error $ "ctxLookupOrd: Did not find " ++ show loc) ord
   where ord = Map.lookup loc ctx
 
-ctxLookup
-  :: String -> Map.Map String TLenvEntry -> Map.Map Integer p -> p
+ctxLookup :: String -> TLenv -> Map.Map Integer p -> p
 ctxLookup d env ctx =
   case dim of
     Just (TLdim loc) -> ctxLookupOrd loc ctx
@@ -363,7 +355,7 @@ ctxLookup d env ctx =
 ctxPerturbOne
   :: String
      -> a
-     -> Map.Map String TLenvEntry
+     -> TLenv
      -> Map.Map Integer a
      -> Map.Map Integer a
 ctxPerturbOne d v env ctx =
@@ -374,7 +366,7 @@ ctxPerturbOne d v env ctx =
 
 ctxPerturb
   :: [(String, a)]
-     -> Map.Map String TLenvEntry
+     -> TLenv
      -> Map.Map Integer a
      -> Map.Map Integer a
 ctxPerturb [] env ctx = ctx
