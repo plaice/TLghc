@@ -13,7 +13,6 @@ module TL.Eval (
    eval
   ,ctxFromAPI
   ,ctxToAPI 
-  ,TLdata(..)
 )
 where
 
@@ -48,9 +47,6 @@ type TLenv = Map.Map String TLenvEntry
 
 -- | 'TLctx' is for the evaluation context.
 type TLctx = Map.Map Integer TLdata
-
--- | 'TLextCtx' is for the external context.
---type TLextCtx = [(String,Integer)]
 
 -- | 'eval' evaluates a TransLucid expression.
 eval :: TLexpr -> TLenv -> TLctx -> TLdata

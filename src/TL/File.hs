@@ -23,12 +23,6 @@ import Data.Maybe
 import TL.AST
 import TL.Eval
 
--- | 'TLextCtx' is for the external context.
-type TLextCtx = [(String,TLdata)]
-
--- | 'TLextCtxRange' is for the external context range
-type TLextCtxRange = [(String,(Integer,Integer))]
-
 -- | 'TLextCtxExpr' is for the external context, as an expression
 type TLextCtxExpr = [(String,TLexpr)]
 
@@ -44,8 +38,8 @@ evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
    (\(TLevalExpr expr extCtxRange) ->
     let expandedRanges = expandCtxRange extCtxRange in
     let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-    let externDims = Map.fromList $ getDims extCtxRange in
-    let (env,ctx) = ctxFromAPI externDims 0 in
+    let externCtx = Map.fromList $ zip (map fst extCtxRange) [0,0..] in
+    let (env,ctx) = ctxFromAPI externCtx 0 in
         show expr ++ "\n" ++
         concatMap
          (\(text,pairs) ->
@@ -67,25 +61,24 @@ expandCtxRange ((dim,(min,max)):ranges) =
  [(dim,TLconst (TLconstInt i)):l |
   i <- [min..max], l <- expandCtxRange ranges]
 
--- | 'getDims' produces all of the points in a MD-range.
-getDims :: TLextCtxRange -> TLextCtx
-getDims [] = []
-getDims ((d,(min,max)):ranges) =
- (d,TLint 0) : getDims ranges
+-- | 'removePrefix' reads a list of strings, and for each string,
+--   removes the prefix common with the previous string in the list.
+--   It is assumed that the strings are all of the form produced
+--   by routine 'foldPairs'.
+removePrefix :: [String] -> [String]
+removePrefix [] = []
+removePrefix (pairs:l) = pairs : removePrefixPrimed pairs l
 
-foldPairs :: TLextCtxExpr -> String
-foldPairs [] = ""
-foldPairs [(d,TLconst (TLconstInt i))] =
-  d ++ " <- " ++ show i
-foldPairs ((d,TLconst (TLconstInt i)):l) =
-  d ++ " <- " ++ show i ++ ", " ++ foldPairs l
+-- | 'removePrefixPrimed' removes the common prefix of the
+-- string 'pairs' from the first element of the list, then
+-- recurses, sliding the window.
+removePrefixPrimed :: String -> [String] -> [String]
+removePrefixPrimed pairs [] = []
+removePrefixPrimed pairs (pairs':l) =
+  removePrefixOne pairs pairs' : removePrefixPrimed pairs' l
 
-fixPrefixOne :: Char -> String -> String
-fixPrefixOne c [] = " "
-fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
-fixPrefixOne '-' (c:pairs) = '-':c:pairs
-fixPrefixOne _ (c:pairs) = ' ':c:pairs
-
+-- | 'removePrefixOne' removes the common prefix of the two
+-- strings from the second string.
 removePrefixOne :: String -> String -> String
 removePrefixOne [] l = l
 removePrefixOne l [] = []
@@ -94,11 +87,18 @@ removePrefixOne (c:pairs) (c':pairs')
               fixPrefixOne c newPairs
   | otherwise = c':pairs'
 
-removePrefix' :: String -> [String] -> [String]
-removePrefix' pairs [] = []
-removePrefix' pairs (pairs':l) =
-  removePrefixOne pairs pairs' : removePrefix' pairs' l
+-- | 'fixPrefixOne' replaces minus signs with blanks should
+--   the minus signs not be followed by an integer.
+fixPrefixOne :: Char -> String -> String
+fixPrefixOne c [] = " "
+fixPrefixOne '-' (' ':pairs) = ' ':' ':pairs
+fixPrefixOne '-' (c:pairs) = '-':c:pairs
+fixPrefixOne _ (c:pairs) = ' ':c:pairs
 
-removePrefix :: [String] -> [String]
-removePrefix [] = []
-removePrefix (pairs:l) = pairs : removePrefix' pairs l
+-- | 'foldPairs' produces the visual output for a 'TLextCtxExpr'
+foldPairs :: TLextCtxExpr -> String
+foldPairs [] = ""
+foldPairs [(d,TLconst (TLconstInt i))] =
+  d ++ " <- " ++ show i
+foldPairs ((d,TLconst (TLconstInt i)):l) =
+  d ++ " <- " ++ show i ++ ", " ++ foldPairs l
