@@ -281,6 +281,11 @@ evalBinopRel op arg1 arg2 env ctx =
 
 -- Utility routines needed for 'evalFile' and 'eval' of arrays.
 
+ctxToAPI
+  :: Ord k =>
+     Map.Map k TLenvEntry -> Map.Map Integer a -> Map.Map k a
+ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
+
 ctxToAPI'
   :: Ord k =>
      Set.Set k
@@ -302,27 +307,24 @@ ctxToAPI' set0 env ctx =
                       _ -> (set, m)
                     where val = Map.lookup key env
 
-ctxToAPI
-  :: Ord k =>
-     Map.Map k TLenvEntry -> Map.Map Integer a -> Map.Map k a
-ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
+ctxFromAPI ctx = ctxFromAPI' ctx 0
 
 ctxFromAPI'
   :: Ord k =>
+     Map.Map k a -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a)
+ctxFromAPI' ctx n = (env', ctx')
+  where
+    (env', ctx', n') = ctxFromAPI'' ctx n
+
+ctxFromAPI''
+  :: Ord k =>
      Map.Map k a
      -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a, Integer)
-ctxFromAPI' ctx n =
+ctxFromAPI'' ctx n =
   Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
   where
     lookAtOne (env', ctx', n') key ord =
       (Map.insert key (TLdim n') env', Map.insert n' ord ctx', n'+1)
-
-ctxFromAPI
-  :: Ord k =>
-     Map.Map k a -> Integer -> (Map.Map k TLenvEntry, Map.Map Integer a)
-ctxFromAPI ctx n = (env', ctx')
-  where
-    (env', ctx', n') = ctxFromAPI' ctx n
 
 -- Utility routines needed for 'eval'.
 
