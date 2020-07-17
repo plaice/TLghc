@@ -48,6 +48,14 @@ type TLenv = Map.Map String TLenvEntry
 -- | 'TLctx' is for the evaluation context.
 type TLctx = Map.Map Integer TLdata
 
+-- | 'TLextCtx' is for the external context.
+type TLextCtx = [(String,Integer)]
+
+-- | 'TLextCtxRange' is for the external context range
+type TLextCtxRange = [(String,(Integer,Integer))]
+
+-- | 'TLextCtxExpr' is for the external context, as an expression
+type TLextCtxExpr = [(String,TLexpr)]
 
 -- | 'checkFile' examines a 'TLfile' for syntax errors.
 checkFile :: TLfile -> Bool
@@ -58,10 +66,10 @@ checkFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
 evalFile :: TLfile -> String
 evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
   concatMap
-   (\(TLevalExpr expr ctxRange) ->
-    let expandedRanges = expandRange ctxRange in
+   (\(TLevalExpr expr extCtxRange) ->
+    let expandedRanges = expandCtxRange extCtxRange in
     let rangeTexts = removePrefix (map foldPairs expandedRanges) in
-    let externDims = Map.fromList $ getDims ctxRange in
+    let externDims = Map.fromList $ getDims extCtxRange in
     let (env,ctx) = ctxFromAPI externDims 0 in
         show expr ++ "\n" ++
         concatMap
@@ -405,14 +413,19 @@ envLookup x env =
   fromMaybe (error $ "envLookup: Did not find " ++ x) expr
   where expr = Map.lookup x env
 
-expandRange :: [(a, (Integer, Integer))] -> [[(a, TLexpr)]]
-expandRange [] = [[]]
-expandRange ((d,(min,max)):ranges) =
- [(d,TLconst (TLconstInt i)):l | i <- [min..max], l <- expandRange ranges]
-
 -- Utility routines needed for 'evalFile'.
 
-getDims :: [(a1, (a2, b))] -> [(a1, TLdata)]
+-- | 'expandCtxRange' produces all of the points in a MD-range.
+-- The input is a list of '(dimension,(minimum,maximum))'.
+-- The output is a list of all the points delimited in this space.
+expandCtxRange :: [(a, (Integer, Integer))] -> [[(a, TLexpr)]]
+expandCtxRange [] = [[]]
+expandCtxRange ((dim,(min,max)):ranges) =
+ [(dim,TLconst (TLconstInt i)):l |
+  i <- [min..max], l <- expandCtxRange ranges]
+
+-- | 'getDims' produces all of the points in a MD-range.
+getDims :: [(a, (b1, b2))] -> [(a, TLdata)]
 getDims [] = []
 getDims ((d,(min,max)):ranges) =
  (d,TLint 0) : getDims ranges
