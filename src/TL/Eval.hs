@@ -48,11 +48,14 @@ type TLenv = Map.Map String TLenvEntry
 -- | 'TLctx' is for the evaluation context.
 type TLctx = Map.Map Integer TLdata
 
+-- | 'TLintCtx' is for the evaluation context, int values.
+type TLintCtx = Map.Map Integer Integer
+
 -- | 'TLextCtx' is for the external context.
 type TLextCtx = Map.Map String TLdata
 
--- | 'TLlistCtx' is for the evaluation context.
-type TLlistCtx = Map.Map String Integer
+-- | 'TLintExtCtx' is for the external context, int values.
+type TLintExtCtx = Map.Map String Integer
 
 -- | 'eval' evaluates a TransLucid expression.
 eval :: TLexpr -> TLenv -> TLctx -> TLdata
@@ -275,10 +278,12 @@ evalBinopRel op arg1 arg2 env ctx =
 
 -- Utility routines needed for 'evalFile' and 'eval' of arrays.
 
+-- | 'ctxToAPI':
 ctxToAPI
   :: TLenv -> TLctx -> TLextCtx
 ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
 
+-- | 'ctxToAPI\'':
 ctxToAPI'
   :: Set.Set String
      -> TLenv
@@ -299,24 +304,26 @@ ctxToAPI' set0 env ctx =
                       _ -> (set, m)
                     where val = Map.lookup key env
 
-
+-- | 'ctxFromAPI':
 ctxFromAPI
-  :: TLlistCtx
-     -> (TLenv, Map.Map Integer Integer)
+  :: TLintExtCtx
+     -> (TLenv, TLintCtx)
 ctxFromAPI ctx = ctxFromAPI' ctx 0
 
+-- | 'ctxFromAPI\'':
 ctxFromAPI'
-  :: TLlistCtx
+  :: TLintExtCtx
      -> Integer
-     -> (TLenv, Map.Map Integer Integer)
+     -> (TLenv, TLintCtx)
 ctxFromAPI' ctx n = (env', ctx')
   where
     (env', ctx', n') = ctxFromAPI'' ctx n
 
+-- | 'ctxFromAPI\'\'':
 ctxFromAPI''
-  :: TLlistCtx
+  :: TLintExtCtx
      -> Integer
-     -> (TLenv, Map.Map Integer Integer, Integer)
+     -> (TLenv, TLintCtx, Integer)
 ctxFromAPI'' ctx n =
   Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
   where

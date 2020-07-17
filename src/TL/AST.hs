@@ -214,6 +214,9 @@ data TLuno = TLunNot
 -- | 'TLextCtxRange' is for the external context range
 type TLextCtxRange = [(String,(Integer,Integer))]
 
+-- | 'TLlistCtx' is for the evaluation context.
+type TLlistCtx = Map.Map String Integer
+
 -- | 'TLeval' is the AST for a TransLucid demand.
 data TLeval = TLevalExpr TLexpr [(String,(Integer,Integer))]
             | TLevalExprError String
