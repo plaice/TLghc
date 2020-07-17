@@ -307,6 +307,10 @@ ctxToAPI' set0 env ctx =
                       _ -> (set, m)
                     where val = Map.lookup key env
 
+
+ctxFromAPI
+  :: Ord k =>
+     Map.Map k a -> (Map.Map k TLenvEntry, Map.Map Integer a)
 ctxFromAPI ctx = ctxFromAPI' ctx 0
 
 ctxFromAPI'
