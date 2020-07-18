@@ -11,8 +11,8 @@ Portability : Portable
 -}
 module TL.Eval (
    eval
-  ,ctxFromAPI
-  ,ctxToAPI 
+  ,ctxFromApi
+  ,ctxToApi
 )
 where
 
@@ -145,20 +145,20 @@ eval (TLconst (TLconstStr s)) env ctx = TLstr s
 eval (TLarray1 str arr) env ctx =
    eval (TLconst ((Array.!) arr tupleIdx)) env ctx
    where
-     ctxAPI = ctxToAPI env ctx
+     ctxAPI = ctxToApi env ctx
      tupleIdx = removeJust $ Map.lookup str ctxAPI
 
 eval (TLarray2 (str1,str2) arr) env ctx =
    eval (TLconst ((Array.!) arr tupleIdx)) env ctx
    where
-     ctxAPI = ctxToAPI env ctx
+     ctxAPI = ctxToApi env ctx
      tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
                  removeJust $ Map.lookup str2 ctxAPI)
 
 eval (TLarray3 (str1,str2,str3) arr) env ctx =
    eval (TLconst ((Array.!) arr tupleIdx)) env ctx
    where
-     ctxAPI = ctxToAPI env ctx
+     ctxAPI = ctxToApi env ctx
      tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
                  removeJust $ Map.lookup str2 ctxAPI,
                  removeJust $ Map.lookup str3 ctxAPI)
@@ -166,7 +166,7 @@ eval (TLarray3 (str1,str2,str3) arr) env ctx =
 eval (TLarray4 (str1,str2,str3,str4) arr) env ctx =
    eval (TLconst ((Array.!) arr tupleIdx)) env ctx
    where
-     ctxAPI = ctxToAPI env ctx
+     ctxAPI = ctxToApi env ctx
      tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
                  removeJust $ Map.lookup str2 ctxAPI,
                  removeJust $ Map.lookup str3 ctxAPI,
@@ -175,7 +175,7 @@ eval (TLarray4 (str1,str2,str3,str4) arr) env ctx =
 eval (TLarray5 (str1,str2,str3,str4,str5) arr) env ctx =
    eval (TLconst ((Array.!) arr tupleIdx)) env ctx
    where
-     ctxAPI = ctxToAPI env ctx
+     ctxAPI = ctxToApi env ctx
      tupleIdx = (removeJust $ Map.lookup str1 ctxAPI,
                  removeJust $ Map.lookup str2 ctxAPI,
                  removeJust $ Map.lookup str3 ctxAPI,
@@ -278,18 +278,19 @@ evalBinopRel op arg1 arg2 env ctx =
 
 -- Utility routines needed for 'evalFile' and 'eval' of arrays.
 
--- | 'ctxToAPI':
-ctxToAPI
+-- | 'ctxToApi': produce an external context from an (env,ctx) pair.
+ctxToApi
   :: TLenv -> TLctx -> TLextCtx
-ctxToAPI env ctx = foldl Map.union Map.empty (ctxToAPI' Set.empty env ctx)
+ctxToApi env ctx
+  = foldl Map.union Map.empty (ctxToApiIterate Set.empty env ctx)
 
--- | 'ctxToAPI\'':
-ctxToAPI'
+-- | 'ctxToApiIterate': secondary function.
+ctxToApiIterate
   :: Set.Set String
      -> TLenv
      -> TLctx
      -> (Set.Set String, TLextCtx)
-ctxToAPI' set0 env ctx =
+ctxToApiIterate set0 env ctx =
   Map.foldlWithKey lookAtOne (set0, Map.fromList []) env
   where
     lookAtOne (set, m) key val
@@ -304,27 +305,28 @@ ctxToAPI' set0 env ctx =
                       _ -> (set, m)
                     where val = Map.lookup key env
 
--- | 'ctxFromAPI':
-ctxFromAPI
+-- | 'ctxFromApi':
+-- | 'ctxFromApi': produce an (env,ctx) pair from an external context.
+ctxFromApi
   :: TLintExtCtx
      -> (TLenv, TLintCtx)
-ctxFromAPI ctx = ctxFromAPI' ctx 0
+ctxFromApi ctx = ctxFromApiN ctx 0
 
--- | 'ctxFromAPI\'':
-ctxFromAPI'
+-- | 'ctxFromApiN': add an extra integer argument.
+ctxFromApiN
   :: TLintExtCtx
      -> Integer
      -> (TLenv, TLintCtx)
-ctxFromAPI' ctx n = (env', ctx')
+ctxFromApiN ctx n = (env', ctx')
   where
-    (env', ctx', n') = ctxFromAPI'' ctx n
+    (env', ctx', n') = ctxFromApiIterate ctx n
 
--- | 'ctxFromAPI\'\'':
-ctxFromAPI''
+-- | 'ctxFromApiIterate': secondary function.
+ctxFromApiIterate
   :: TLintExtCtx
      -> Integer
      -> (TLenv, TLintCtx, Integer)
-ctxFromAPI'' ctx n =
+ctxFromApiIterate ctx n =
   Map.foldlWithKey lookAtOne (Map.fromList [], Map.fromList [], n) ctx
   where
     lookAtOne (env', ctx', n') key ord =

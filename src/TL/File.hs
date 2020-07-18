@@ -39,7 +39,7 @@ evalFile (TLfile dims vars funcs evalExprs errs1 errs2 errs3 errs4) =
     let expandedRanges = expandCtxRange extCtxRange in
     let rangeTexts = removePrefix (map foldPairs expandedRanges) in
     let externCtx = Map.fromList $ zip (map fst extCtxRange) [0,0..] in
-    let (env,ctx) = ctxFromAPI externCtx in
+    let (env,ctx) = ctxFromApi externCtx in
         show expr ++ "\n" ++
         concatMap
          (\(text,pairs) ->
