@@ -35,7 +35,7 @@ main = do
   testOne "mm"
   testOne "funCalls"
   testOne "nnext"
-  testOne "static"
+  testOne "lexical"
 
 testOne func = do
   textTL <- readFile ("test/tl/" ++ func ++ ".tl")

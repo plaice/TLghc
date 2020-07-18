@@ -1,5 +1,13 @@
 # Revision history for TLghc
 
+## 0.6.0.0 - 2020-07-17
+
+* Adapt the evaluator to correspond to the paper.
+* Fixed binding so that it is lexical.
+* Split out File.hs from Eval.hs.
+* Type declarations use type synonyms.
+* Documented all types and functions.
+
 ## 0.5.0.0 - 2020-07-11
 
 * Refactored and documented the code, clarified the AST.

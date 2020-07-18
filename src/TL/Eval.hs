@@ -334,6 +334,32 @@ ctxFromApiIterate ctx n =
 
 -- Utility routines needed for 'eval'.
 
+-- | 'envLookup': find a name in the environment
+envLookup :: String -> TLenv -> TLenvEntry
+envLookup x env =
+  fromMaybe (error $ "envLookup: Did not find " ++ x) expr
+  where expr = Map.lookup x env
+
+-- | 'ctxRank': compute the rank of the context.
+ctxRank :: Map.Map Integer b -> Integer
+ctxRank = Map.foldlWithKey (\n k x -> max k n) 0
+
+-- | 'ctxLookup': lookup a dimension in the context.
+ctxLookup :: String -> TLenv -> TLctx -> TLdata
+ctxLookup d env ctx =
+  case dim of
+    Just (TLdim loc) -> ctxLookupOrd loc ctx
+    Nothing -> error $ "ctxLookup: Did not find " ++ d
+    _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
+  where dim = Map.lookup d env
+
+-- | 'ctxLookupOrd': find the ordinate for a location.
+ctxLookupOrd :: Integer -> TLctx -> TLdata
+ctxLookupOrd loc ctx =
+  fromMaybe (error $ "ctxLookupOrd: Did not find " ++ show loc) ord
+  where ord = Map.lookup loc ctx
+
+-- | 'getLoc': get the location for one dimension.
 getLoc :: String -> TLenv -> Integer
 getLoc d env =
   case dim of
@@ -342,47 +368,21 @@ getLoc d env =
     _ -> error $ "getLoc: " ++ d ++ " is not a dimension identifier"
   where dim = Map.lookup d env
 
-removeJust :: Maybe TLdata -> Integer
-removeJust (Just (TLint i)) = i
+-- | 'ctxPerturb': perturb the current context.
+ctxPerturb
+  :: [(String, TLdata)] -> TLenv -> TLctx -> TLctx
+ctxPerturb [] env ctx = ctx
+ctxPerturb ((d,v):subs) env ctx =
+  ctxPerturbOne d v env $ ctxPerturb subs env ctx
 
-ctxRank :: Map.Map Integer b -> Integer
-ctxRank = Map.foldlWithKey (\n k x -> max k n) 0
-
-ctxLookupOrd :: (Show k, Ord k) => k -> Map.Map k a -> a
-ctxLookupOrd loc ctx =
-  fromMaybe (error $ "ctxLookupOrd: Did not find " ++ show loc) ord
-  where ord = Map.lookup loc ctx
-
-ctxLookup :: String -> TLenv -> Map.Map Integer p -> p
-ctxLookup d env ctx =
-  case dim of
-    Just (TLdim loc) -> ctxLookupOrd loc ctx
-    Nothing -> error $ "ctxLookup: Did not find " ++ d
-    _ -> error $ "ctxLookup: " ++ d ++ " is not a dimension identifier"
-  where dim = Map.lookup d env
-
-ctxPerturbOne
-  :: String
-     -> a
-     -> TLenv
-     -> Map.Map Integer a
-     -> Map.Map Integer a
+-- | 'ctxPerturbOne': perturb the current context for one dimension.
+ctxPerturbOne :: String -> TLdata -> TLenv -> TLctx -> TLctx
 ctxPerturbOne d v env ctx =
   case dim of
     Just (TLdim loc) -> Map.insert loc v ctx
     Nothing -> error $ "ctxPerturbOne: Did not find " ++ d
   where dim = Map.lookup d env
 
-ctxPerturb
-  :: [(String, a)]
-     -> TLenv
-     -> Map.Map Integer a
-     -> Map.Map Integer a
-ctxPerturb [] env ctx = ctx
-ctxPerturb ((d,v):subs) env ctx =
-  ctxPerturbOne d v env $ ctxPerturb subs env ctx
-
-envLookup :: String -> Map.Map String a -> a
-envLookup x env =
-  fromMaybe (error $ "envLookup: Did not find " ++ x) expr
-  where expr = Map.lookup x env
+-- | 'removeJust': return an integer.
+removeJust :: Maybe TLdata -> Integer
+removeJust (Just (TLint i)) = i
