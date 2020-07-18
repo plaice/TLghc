@@ -11,7 +11,7 @@ module TL (
   processText
 ) where
 
-import TL.Eval
+import TL.File
 import TL.Parse
 
 -- | The 'processText' function processes a TransLucid program.

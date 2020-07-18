@@ -1,0 +1,27 @@
+TLfile
+  TLdeclVar "result"
+    TLwhere
+      TLdeclVar "a"
+        TLconst TLconstInt 5
+      TLdeclVar "v"
+        TLwhere
+          TLdeclVar "a"
+            TLconst TLconstInt 7
+          TLdeclVar "b"
+            TLbinop TLbinMinus
+              TLvar "a"
+              TLconst TLconstInt 7
+          TLdeclVar "w"
+            TLapply TLvar "f"
+              TLconst TLconstInt 3
+          TLbinop TLbinPlus
+            TLvar "w"
+            TLvar "b"
+      TLdeclFunc "f" [] ["x"]
+        TLbinop TLbinPlus
+          TLvar "x"
+          TLvar "a"
+      TLvar "v"
+  TLevalExpr TLvar "result"
+    []
+========
